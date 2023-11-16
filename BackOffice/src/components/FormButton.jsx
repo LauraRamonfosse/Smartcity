@@ -10,7 +10,7 @@ function FormButton({ type, form }) {
 
   return (
     <>
-        <button id = "button" onClick={toggleFormVisibility}>{type}</button>
+        <button id = "formButton" onClick={toggleFormVisibility}>{type}</button>
         {isFormVisible && <div className="formLabelContainer">{form}</div>}
     </>
   );
