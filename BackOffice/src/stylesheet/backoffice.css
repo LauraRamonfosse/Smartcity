@@ -99,21 +99,22 @@ body {
 }
 
 /*FORMS */
-#button{
-  position: flex;
-  top: 400px;
-  overflow-x: auto; /* Utilisez overflow-x: auto pour activer la barre de défilement horizontale uniquement si nécessaire */
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: center;
+#formButton{
+  margin-top: 60px;
   border : 2px solid black;
-  font-family: 'Karla';
-  font-size : large;
   color: black;
-  min-width: 100%;
-  margin-top: 25px;
   background-color: #F5F5ED;
-
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 51px;
+  flex-shrink: 0;
+  font-family: 'Arial';
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 7.2px;
+  word-spacing: 100px;
 }
 
 
@@ -125,10 +126,9 @@ body {
 
 
 /* DIEGO */
-
 .field {
   width: 235px;
-  margin: 10px 20px;
+  margin: 0 20px 10px 0;
   display: flex;
   flex-flow: column wrap;
   justify-content: center;
@@ -146,6 +146,18 @@ body {
   font-family: 'Open Sans', sans-serif;
   border: 0 2px 0 2px solid black;
   border-radius: 0;
+}
+
+form{
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid black;
+  background-color: #DDDDD8;
+  padding: 20px;
+  width: 100%;
+
 }
 
 .largeField {
