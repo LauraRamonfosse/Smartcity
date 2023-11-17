@@ -1,0 +1,31 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "initDB": "node scripts/JS/initDB.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-promise-router": "^4.1.1",
+    "express-session": "^1.17.3",
+    "jsonwebtoken": "^9.0.2",
+    "memorystore": "^1.6.7",
+    "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
+    "process": "^0.11.10",
+    "sequelize": "^6.35.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "swagger-jsdoc": "^6.2.8"
+  }
+}
