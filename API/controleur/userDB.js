@@ -6,11 +6,8 @@ const hash = require('../utils/utils');
 const pool = require('../modele/database');
 const UserModele = require('../modele/userDB');
 
-
-// write the code that will be used when a user login
 module.exports.login = async (req, res) => {
     
-    const secretKey = 'constantinople';
 
     const {username, password} = req.body;
     if(username === undefined || password === undefined){
@@ -20,20 +17,15 @@ module.exports.login = async (req, res) => {
         try {
             const result = (await UserModele.login(client, username));
             const user = result.rows[0];
-            // console.log('User:', user); // Debug log
-            // console.log('Username:', username); // Debug log
-            // console.log('Hashed password', await hash.getHash(password)); // Debug log
-            // console.log('User Hashed Password', user.password);
             if(user !== undefined && await hash.compareHash(password, user.password)){
                 const {id, role} = user;
                 if (role !== "admin" && role !== "user") {
                     res.sendStatus(404);
                 } else {
-                    const payload = {status: role, value: id};
-                    // console.log('Payload:', payload); // Debug log
+                    const payload = {status: role, value: {id: user.id}};
                     const token = jwt.sign(
                         payload,
-                        secretKey,
+                        process.env.SECRET_TOKEN,
                         {expiresIn: '1d'}
                     );
                     res.json(token);
@@ -48,6 +40,66 @@ module.exports.login = async (req, res) => {
         } finally {
             client.release();
         }
+    }
+}
+
+module.exports.updateUser = async (req, res) => {
+    if(req.session){
+        const client = await pool.connect();
+        const toUpdate = req.body;
+        const newData = {};
+        const userObj = req.session;
+        const {rows: users} = await UserModele.getUserById(client, userObj.id);
+        const user = users[0];
+        let doUpdate = false;
+        if(toUpdate.id !== null && user.role === "admin"){
+            newData.id = parseInt(toUpdate.id);
+        }
+        else{
+            newData.id = userObj.id;
+        }
+
+        if(
+            toUpdate.username !== undefined ||
+            toUpdate.email_adress !== undefined ||
+            toUpdate.password !== undefined ||
+            toUpdate.country !== undefined ||
+            toUpdate.phone_number !== undefined ||
+            toUpdate.news_letter !== undefined
+        ){
+            doUpdate = true;
+        }
+
+        if(doUpdate){
+            newData.username = toUpdate.username;
+            newData.emailAdress = toUpdate.email_adress;
+            newData.password = toUpdate.password;
+            newData.country = toUpdate.country;
+            newData.phoneNumber = toUpdate.phone_number;
+            newData.newsLetter = toUpdate.news_letter;
+        }
+
+        try{
+            await UserModele.updateUser(
+                client,
+                newData.id,
+                newData.username,
+                newData.emailAdress,
+                newData.password,
+                newData.country,
+                newData.phoneNumber,
+                newData.newsLetter
+            );
+            res.sendStatus(204);
+        }
+        catch (e) {
+            console.error(e);
+            res.sendStatus(500);
+        } finally {
+            client.release();
+        }
+    } else {
+        res.sendStatus(401);
     }
 }
 
@@ -114,13 +166,13 @@ module.exports.createUser = async (req, res) => {
         await UserModele.createUser(
             client,
             newData.username,
-            newData.emailAdress,
+            newData.email_adress,
             newData.password,
             newData.role,
             newData.country,
-            newData.phoneNumber,
-            newData.newsLetter,
-            newData.profilePicturePath
+            newData.phone_number,
+            newData.news_letter,
+            newData.profile_picture_path
         );
         res.sendStatus(201);
     }
@@ -132,43 +184,6 @@ module.exports.createUser = async (req, res) => {
     }
 }
 
-
-module.exports.updateUser = async (req, res) => {
-    if(req.session){
-        const toUpdate = req.body;
-        const newData = {};
-
-        // newData.username = toUpdate.username ? toUpdate.username : userObj.username;
-        // newData.emailAdress = toUpdate.emailAdress ? toUpdate.emailAdress : userObj.emailAdress;
-        // newData.password = toUpdate.password ? toUpdate.password : userObj.password;
-        // newData.country = toUpdate.country ? toUpdate.country : userObj.country;
-        // newData.phoneNumber = toUpdate.phoneNumber ? toUpdate.phoneNumber : userObj.phoneNumber;
-        // newData.newsLetter = toUpdate.newsLetter ? toUpdate.newsLetter : userObj.newsLetter;
-
-        const client = await pool.connect();
-        try{
-            await UserModele.updateUser(
-                client,
-                toUpdate.id,
-                toUpdate.username,
-                toUpdate.emailAdress,
-                toUpdate.password,
-                toUpdate.country,
-                toUpdate.phoneNumber,
-                toUpdate.newsLetter
-            );
-            res.sendStatus(204);
-        }
-        catch (e) {
-            console.error(e);
-            res.sendStatus(500);
-        } finally {
-            client.release();
-        }
-    } else {
-        res.sendStatus(401);
-    }
-}
 
 // delete user
 module.exports.deleteUser = async (req, res) => {
