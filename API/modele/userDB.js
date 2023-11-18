@@ -7,16 +7,57 @@ module.exports.getUserById = async (client, id) => {
 
 module.exports.createUser = async (client, password, emailAdress, role, country, phoneNumber, newsLetter, profilePicturePath) => {
     return await client.query(
-        `INSERT INTO account (username, password, emailAdress, role, country, phoneNumber, newsLetter, profilePicturePath) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        `INSERT INTO account (username, password, email_adress, role, country, phone_number, news_letter, profile_picture_path) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [username, await getHash(password), emailAdress, role, country, phoneNumber, newsLetter, profilePicturePath]
     );
 }
 
+// client,
+// userObj.id,
+// newData.username,
+// newData.emailAdress,
+// newData.password,
+// newData.country,
+// newData.phoneNumber,
+// newData.newsLetter
+
 module.exports.updateUser = async (client, id, username, emailAdress, password, country, phoneNumber, newsLetter) => {
-    return await client.query(
-        `UPDATE account SET username = $2, password = $3, emailAdress = $4, country = $5, phoneNumber = $6, newsLetter = $7 WHERE id = $1`,
-        [id, username, await getHash(password), emailAdress, country, phoneNumber, newsLetter]
-    );
+
+    const params = [];
+    const querySet = [];
+    let query = "UPDATE account SET ";
+    if(username !== undefined){
+        params.push(username);
+        querySet.push(` username = $${params.length} `);
+    }
+    if(emailAdress !== undefined){
+        params.push(emailAdress);
+        querySet.push(` email_adress = $${params.length} `);
+    }
+    if(password !== undefined){
+        params.push(await getHash(password));
+        querySet.push(` password = $${params.length} `);
+    }
+    if(country !== undefined){
+        params.push(country);
+        querySet.push(` country = $${params.length} `);
+    }
+    if(phoneNumber !== undefined){
+        params.push(phoneNumber);
+        querySet.push(` phone_number = $${params.length} `);
+    }
+    if(newsLetter !== undefined){
+        params.push(newsLetter);
+        querySet.push(` news_letter = $${params.length} `);
+    }
+    if(params.length > 0){
+        query += querySet.join(',');
+        params.push(id);
+        query += ` WHERE id = $${params.length}`;
+        return client.query(query, params);
+    } else {
+        throw new Error("No field to update");
+    }
 }
 
 
