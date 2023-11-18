@@ -1,46 +1,3 @@
-DROP TABLE IF EXISTS produit CASCADE;
-CREATE TABLE produit (
-    id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    nom varchar,
-    prix float
-);
-
-INSERT INTO produit (nom, prix) VALUES
-('Playstation 4', 400),
-('Xbox One', 399.99),
-('Nintendo Switch', 349.99);
-
-DROP TABLE IF EXISTS client CASCADE;
-
-CREATE TABLE client(
-    id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    nom varchar,
-    prenom varchar,
-    adresse varchar,
-    password varchar
-);
-
-INSERT INTO client (nom, prenom, adresse, password) VALUES ('Poirier', 'Tevin', '11, rue du Faubourg National 95150 TAVERNY', 'motdepasse');
-
-DROP TABLE IF EXISTS manager CASCADE;
-
-CREATE TABLE manager(
-    id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    nom varchar,
-    password varchar
-);
-
-INSERT INTO manager (nom, password) VALUES ('John', 'password');
-
-DROP TABLE IF EXISTS achat CASCADE;
-
-CREATE TABLE achat (
-   id_produit integer REFERENCES produit(id) DEFERRABLE INITIALLY IMMEDIATE,
-   id_client integer REFERENCES client(id) DEFERRABLE INITIALLY IMMEDIATE,
-   quantite integer,
-   "date" date,
-   PRIMARY KEY(id_client, id_produit, "date")
-);
 
 -- PROJET API
 
@@ -49,20 +6,22 @@ DROP TABLE IF EXISTS account CASCADE;
 CREATE TABLE  account(
     id  integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     username  varchar UNIQUE NOT NULL,
-    emailAdress varchar UNIQUE NOT NULL check (emailAdress ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
+    email_adress varchar UNIQUE NOT NULL check (email_adress ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
     password varchar NOT NULL,
     role varchar NOT NULL,
     country varchar,
-    phoneNumber varchar,
-    newsLetter boolean NOT NULL,
-    profilePicturePath varchar NOT NULL
+    phone_number varchar,
+    news_letter boolean NOT NULL,
+    profile_picture_path varchar NOT NULL
 );
 
 
-INSERT INTO account (username, emailAdress, password, role, country, phoneNumber, newsLetter, profilePicturePath) VALUES 
+INSERT INTO account (username, email_adress, password, role, country, phone_number, news_letter, profile_picture_path) VALUES 
 ('Xx_DarkSasuke_xX', 'gougougagak@gougou.gak', 'password', 'user', 'France', '0123456789', true, 'none'),
 ('Tevin', 'azgzgz@hotmail.com', '$2b$10$NoPg1zzNKCDXiGxqXfU00.HG.wYDVr12sFNqVn9bIqfLgkf.ANhuK', 'user', 'France', '0123456789', false, 'none'),
+('CykaBlyat_17', 'cyka@hotmail.be', '$2b$10$8SD4JuJ3jE/Qxp55rYk2UuxxCW.GcDMH9zhW2sAQyziV7.gJcWOVG', 'admin', 'Belgique', '0488386818', false, 'none'),
 ('CarlosMarcos', 'carlos.marcos@hotmail.fr', 'password', 'user', 'France', '0123456789', true, 'none');
+
 
 
 -- CREATE TABLE review(
