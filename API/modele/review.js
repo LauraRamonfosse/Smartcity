@@ -25,5 +25,4 @@ module.exports.updateReview = async (client, id, title, newContent) => {
 
 module.exports.deleteReview = async (client, id) => {
     return await client.query("DELETE FROM review WHERE id = $1", [id]);
-}
-
+};
