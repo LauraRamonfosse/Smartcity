@@ -37,3 +37,7 @@ module.exports.updateComment = async (client, id, newContent) => {
 module.exports.deleteComment = async (client, id) => {
     return await client.query("DELETE FROM message WHERE id = $1", [id]);
 };
+
+module.exports.deleteCommentsFromReview = async (client, reviewId) => {
+    return await client.query("DELETE FROM message WHERE review_id = $1", [reviewId]);
+};
