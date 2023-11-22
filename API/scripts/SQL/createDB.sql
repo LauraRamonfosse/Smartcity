@@ -1,4 +1,26 @@
+CREATE TABLE book (
+    isbn VARCHAR PRIMARY KEY,
+    title VARCHAR NOT NULL CHECK (title ~ '^[A-Za-zÀ-ÖØ-öø-ÿ -]+$'),
+    description VARCHAR NOT NULL CHECK (description ~ '^[A-Za-zÀ-ÖØ-öø-ÿ0-9.,;:!?() -]+$'),
+    country VARCHAR NOT NULL CHECK (country ~ '^[A-Za-zÀ-ÖØ-öø-ÿ -]+$'),
+    genre VARCHAR NOT NULL CHECK (genre ~ '^[A-Za-zÀ-ÖØ-öø-ÿ -]+$'),
+    released_year INTEGER NOT NULL CHECK (released_year >= 0),
+    pages INTEGER NOT NULL CHECK (pages >= 0),
+    publishing_house VARCHAR NOT NULL CHECK (publishing_house ~ '^[A-Za-zÀ-ÖØ-öø-ÿ -]+$'),
+    img_path VARCHAR
+);
 
+CREATE TABLE actor (
+    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    name VARCHAR NOT NULL CHECK (name ~ '^[A-Za-zÀ-ÖØ-öø-ÿ -]+$')
+);
+
+CREATE TABLE role (
+    id_book VARCHAR REFERENCES book(isbn) DEFERRABLE INITIALLY IMMEDIATE,
+    id_actor INTEGER REFERENCES actor(id) DEFERRABLE INITIALLY IMMEDIATE,
+    title VARCHAR NOT NULL CHECK (title ~ '^[A-Za-zÀ-ÖØ-öø-ÿ -]+$'),
+    PRIMARY KEY(id_book, id_actor)
+);
 -- PROJET API
 
 DROP TABLE IF EXISTS account CASCADE;
