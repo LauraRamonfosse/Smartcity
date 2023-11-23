@@ -61,8 +61,9 @@ module.exports.updateUser = async (req, res) => {
 
         if(
             toUpdate.username !== undefined ||
-            toUpdate.email_adress !== undefined ||
+            toUpdate.email_address !== undefined ||
             toUpdate.password !== undefined ||
+            toUpdate.role !== undefined ||
             toUpdate.country !== undefined ||
             toUpdate.phone_number !== undefined ||
             toUpdate.news_letter !== undefined
@@ -72,11 +73,12 @@ module.exports.updateUser = async (req, res) => {
 
         if(doUpdate){
             newData.username = toUpdate.username;
-            newData.emailAdress = toUpdate.email_adress;
+            newData.email_address = toUpdate.email_address;
             newData.password = toUpdate.password;
+            newData.role = toUpdate.role;
             newData.country = toUpdate.country;
-            newData.phoneNumber = toUpdate.phone_number;
-            newData.newsLetter = toUpdate.news_letter;
+            newData.phone_number = toUpdate.phone_number;
+            newData.news_letter = toUpdate.news_letter;
         }
 
         try{
@@ -84,11 +86,12 @@ module.exports.updateUser = async (req, res) => {
                 client,
                 newData.id,
                 newData.username,
-                newData.emailAdress,
+                newData.email_address,
                 newData.password,
+                newData.role,
                 newData.country,
-                newData.phoneNumber,
-                newData.newsLetter
+                newData.phone_number,
+                newData.news_letter
             );
             res.sendStatus(204);
         }
@@ -136,6 +139,7 @@ module.exports.getUser = async (req, res) => {
         try{
             const {rows: users} = await UserModele.getUser(client, userObj.id);
             const user = users[0];
+            console.log(user);
             if(user !== undefined){
                 res.json(user);
             } else {
@@ -166,8 +170,8 @@ module.exports.createUser = async (req, res) => {
         await UserModele.createUser(
             client,
             newData.username,
-            newData.email_adress,
             newData.password,
+            newData.email_address,
             newData.role,
             newData.country,
             newData.phone_number,
