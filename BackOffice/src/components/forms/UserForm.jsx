@@ -62,26 +62,25 @@ function UserForm({content}){
     }, [params.type]);
 
 // write the handleSubmit function here
-const handleForm = (e) => {
-    e.preventDefault();
-    // empty the form
-    setUsername('');
-    setPassword('');
-    setPassword2('');
-    setCountry('');
-    setEmail('');
-    setPhone('');
-    setNewsletter(false);
-    if (params.type === 'add') {
-        // Show the information in a pop-up window
+async function sendForm (event) {
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('password', password);
+    formData.append('country', country);
+    formData.append('email_address', email);
+    formData.append('phone_number', phone);
+    formData.append('news_letter', newsletter);
+    // formData.append('avatar', avatar.current);
+    try {
+        await APISendForm(formData);
+        console.log('OK');
+        //write the alert here
         alert('The user has been added to the database');
-    } else if (params.type === 'modify') {
-        // Set shouldNavigate to true to trigger the navigation in useEffect
-        navigate('/users/add');
-        // Show the information in a pop-up window
-        alert('The user has been modified');
-      }
-};
+    } catch (e) {
+        console.log(e);
+    }
+}
 
     return(
         //write the form here
