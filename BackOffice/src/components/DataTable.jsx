@@ -10,22 +10,25 @@ import { FaCommentAlt } from "react-icons/fa";
 import { FaRegCircle } from "react-icons/fa";
 import { FaRegCheckCircle } from "react-icons/fa";
 
-function DataTable({headers, dataRows, name}) {
+function DataTable({headers, dataRows}) {
 
   const elementsPerPage = 7; // Nombre d'éléments par page
   const [page, setPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearch = (term) => {
-    setSearchTerm(term);
+    console.log("user: ", term);
+    setSearchTerm(term? term : "");
     setPage(1);
   };
   // Filtrage en fonction de la recherche
-  const filteredRows = dataRows.filter((row) =>
-    row.some(
-      (field) => field.content.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  const filteredRows = dataRows.filter((row) => {
+    return row.some((cell) => {
+      return cell.content.toString().toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  });
+
+  console.log("searchTerm: ", searchTerm);
 
 
   //Calculer le nbre de pages nécessaires en arrondissant vers le haut
@@ -47,6 +50,10 @@ function DataTable({headers, dataRows, name}) {
   const startIndex = (page - 1) * elementsPerPage;
   const endIndex = page * elementsPerPage;
   const rowsPerPage = filteredRows.slice(startIndex, endIndex);
+  console.log("rowsPerPage: ", rowsPerPage);
+  console.log("startIndex: ", startIndex);
+  console.log("endIndex: ", endIndex);
+  console.log("filtered rows: ", filteredRows);
 
   return (
     <>
@@ -64,17 +71,17 @@ function DataTable({headers, dataRows, name}) {
 
           <tbody>
           {
-                    rowsPerPage.map((dataRow, rowIndex) => 
-                    <tr key={rowIndex}>
+                    rowsPerPage.map((dataRow) => 
+                    <tr key={dataRow[0].content}>
                         {
                             dataRow.map(dr => 
                             <td>
                                 {dr.type == "text" ? (
                                     dr.content
                                 ): dr.type == "deleteButton" ?(
-                                    <DeleteButton id={rowIndex}/>
+                                    <DeleteButton id={dataRow[0].content}/>
                                 ): dr.type == "modifyButton" ?(
-                                    <ModifyButton id={rowIndex}/>
+                                    <ModifyButton id={dataRow[0].content}/>
                                 ): dr.type == "infosButton" ?(
                                     <>
                                      <Popover content={dr.content} trigger="click">
@@ -85,7 +92,7 @@ function DataTable({headers, dataRows, name}) {
                                     </>
                                 ): dr.type == "commentsButton" ?(
                                     <Link to='/comments/add'><FaLink/></Link>
-                                ) : (dr.content === 'true' ? (
+                                ) : (dr.content ? (
                                     <FaRegCheckCircle/>
                                   ):(
                                     <FaRegCircle/>

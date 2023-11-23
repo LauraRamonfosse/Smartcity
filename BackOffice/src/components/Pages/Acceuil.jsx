@@ -8,6 +8,7 @@ import CommentForm from "../forms/CommentForm";
 import { BackOfficeLayout } from "../BackOfficeLayout";
 import { useEffect } from "react";
 import { useState } from "react";
+import { getAllUsers } from "../../API/user";
 import "../../stylesheet/backoffice.css";
 
 
@@ -33,30 +34,30 @@ function Acceuil() {
       }
 
 
-    const userHeaders = ['USERNAME', 'EMAIL', 'PASSWORD', 'COUNTRY', 'PHONE NUMBER', 'NEWSLETTER', 'MODIFY', 'DELETE'] ;
+    const userHeaders = ['ID', 'USERNAME', 'EMAIL', 'PASSWORD', 'COUNTRY', 'PHONE NUMBER', 'NEWSLETTER', 'MODIFY', 'DELETE'] ;
     
-    const userDataRows = [
-        [
-            {type: 'text', content: 'CarlosMarcos'},
-            {type: 'text', content: 'Gougougagak@gougou.gak'},
-            {type: 'text', content: '********'},
-            {type: 'text', content: 'france'},
-            {type: 'text', content: '0123456789'},
-            {type: 'boolean', content: 'true'},
-            {type: 'modifyButton', content: 'Modify'},
-            {type: 'deleteButton', content: 'Delete'}
-        ],
-        [
-            {type: 'text', content: 'Xx_Darksasuke_xX'},
-            {type: 'text', content: 'darkgougougak@a.AAAA'},
-            {type: 'text', content: '********'},
-            {type: 'text', content: 'belgique'},
-            {type: 'text', content: '012345546'},
-            {type: 'boolean', content: 'false'},
-            {type: 'modifyButton', content: 'Modify'},
-            {type: 'deleteButton', content: 'Delete'}
-        ]
-    ];
+    // const userDataRows = [
+    //     [
+    //         {type: 'text', content: 'CarlosMarcos'},
+    //         {type: 'text', content: 'Gougougagak@gougou.gak'},
+    //         {type: 'text', content: '********'},
+    //         {type: 'text', content: 'france'},
+    //         {type: 'text', content: '0123456789'},
+    //         {type: 'boolean', content: 'true'},
+    //         {type: 'modifyButton', content: 'Modify'},
+    //         {type: 'deleteButton', content: 'Delete'}
+    //     ],
+    //     [
+    //         {type: 'text', content: 'Xx_Darksasuke_xX'},
+    //         {type: 'text', content: 'darkgougougak@a.AAAA'},
+    //         {type: 'text', content: '********'},
+    //         {type: 'text', content: 'belgique'},
+    //         {type: 'text', content: '012345546'},
+    //         {type: 'boolean', content: 'false'},
+    //         {type: 'modifyButton', content: 'Modify'},
+    //         {type: 'deleteButton', content: 'Delete'}
+    //     ]
+    // ];
 
     /* BOOKS */	
     const book = {
@@ -232,20 +233,56 @@ function Acceuil() {
     //if name = comments, then display the comments page
     //if name = roles, then display the roles page
     //if name = actors, then display the actors page
+    // get all users but make sure to wait until the function is done
+    // before setting the userDataRows
+    // userDataRows.push([
+    //     {type: 'text', content: user.username},
+    //     {type: 'text', content: user.email_address},
+    //     {type: 'text', content: user.password},
+    //     {type: 'text', content: user.country},
+    //     {type: 'text', content: user.phone_number},
+    //     {type: 'boolean', content: user.news_letter},
+    //     {type: 'modifyButton', content: 'Modify'},
+    //     {type: 'deleteButton', content: 'Delete'}
+    // ]);
+    const fetchUserData = async () => {
+        try {
+            const userDataRows = [];
+            const users = await getAllUsers();
+            users.forEach(user => {
+                userDataRows.push([
+                    {type: 'text', content: user.id},
+                    {type: 'text', content: user.username},
+                    {type: 'text', content: user.email_address},
+                    {type: 'text', content: user.password},
+                    {type: 'text', content: user.country},
+                    {type: 'text', content: user.phone_number},
+                    {type: 'boolean', content: user.news_letter},
+                    {type: 'modifyButton', content: 'Modify'},
+                    {type: 'deleteButton', content: 'Delete'}
+                ]);
+            });
+            console.log("userDataRows", userDataRows);
+            setContent(
+                <>
+                    <DataTable headers={userHeaders} dataRows={userDataRows}/>
+                    <FormButton type={type} form={<UserForm type={type} content={user}/>}/>
+                </>
+            );
+        } catch (error) {
+            console.error("Error fetching data: ", error);
+        }
+    };
     useEffect(() => {
         switch(name){
             case 'users':
-                setContent(
-                    <>
-                        <DataTable headers={userHeaders} dataRows={userDataRows} name={'users'}/>
-                        <FormButton type={type} form={<UserForm type={type} content={user}/>}/>
-                    </>
-                );
+                fetchUserData();
+                
                 break;
             case 'books':
                 setContent(
                     <>
-                        <DataTable headers={bookHeaders} dataRows={bookDataRows} name={'books'}/>
+                        <DataTable headers={bookHeaders} dataRows={bookDataRows}/>
                         <FormButton type={type} form={<BookForm type={type} content={book}/>}/>
                     </>
                 );
@@ -253,7 +290,7 @@ function Acceuil() {
             case 'reviews':
                 setContent(
                     <>
-                        <DataTable headers={reviewHeaders} dataRows={reviewDataRows} name={'reviews'}/>
+                        <DataTable headers={reviewHeaders} dataRows={reviewDataRows}/>
                         <FormButton type={type} form={<ReviewForm type={type} content={review}/>}/>
                     </>
                 );
@@ -261,7 +298,7 @@ function Acceuil() {
             case 'comments':
                 setContent(
                     <>
-                        <DataTable headers={commentHeaders} dataRows={commentDataRows} name={'comments'}/>
+                        <DataTable headers={commentHeaders} dataRows={commentDataRows}/>
                         <FormButton type={type} form={<CommentForm type={type} content={comment}/>}/>
                     </>
                 );
@@ -284,7 +321,7 @@ function Acceuil() {
                 setContent(<></>);
                 break;
         }
-    });
+    }, [name]);
 
 
     return (

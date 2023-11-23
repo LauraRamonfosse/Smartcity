@@ -4,15 +4,14 @@ import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import "../stylesheet/backoffice.css";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { deleteUser } from "../API/user";
 
 //write a button that delete a line from a table, that recieve the name of the table and the id of the line
 function DeleteButton({id}) {
   const [showAlert, setShowAlert] = useState(false);
   const handleClick = () => {
-    //delete the line from the table
-    console.log("The line has been deleted");
-    //open a pop-up window instead to inform of the success
-    alert("The line has been deleted");
+    deleteUser(id);
+    setShowAlert(true);
   };
 
 
