@@ -10,7 +10,7 @@ module.exports.getReview = async (req, res) => {
         if(isNaN(id)){
             res.sendStatus(400);
         } else {
-            const {rows: comments} = await commentModele.getReview(client, id);
+            const {rows: comments} = await reviewModele.getReview(client, id);
             const comment = comments[0];
             if(comment !== undefined){
                 res.json(comment);
@@ -32,7 +32,7 @@ module.exports.postReview = async (req, res) => {
     const {title, content, user_id, book_id} = body;
     const client = await pool.connect();
     try{
-        const {rows} = await commentModele.postReview(client, title, content, user_id, book_id);
+        const {rows} = await reviewModele.postReview(client, title, content, user_id, book_id);
         res.sendStatus(201).send(rows[0].id);
     } catch (error){
         console.error(error);
@@ -46,7 +46,7 @@ module.exports.updateReview = async (req, res) => {
     const {id, title, newContent} = req.body;
     const client = await pool.connect();
     try{
-        await commentModele.updateReview(client, id, title, newContent);
+        await reviewModele.updateReview(client, id, title, newContent);
         res.sendStatus(204);
     } catch (error){
         console.error(error);
@@ -67,11 +67,11 @@ module.exports.deleteReview = async (req, res) => {
             return;
         }
         await client.query("BEGIN");
-        await commentModele.deleteCommentsFromReview(client, reviewId);
+        await commentModele.deleteCommentsFromReview(client, id);
         await reviewModele.deleteReview(client, id);
         await client.query("COMMIT");
 
-        res.senStatus(204);
+        res.sendStatus(204);
     } catch (error) {
         await client.query("ROLLBACK");
         console.error(error);
