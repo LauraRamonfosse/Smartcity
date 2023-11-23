@@ -5,13 +5,35 @@ import "reactjs-popup/dist/index.css";
 import "../stylesheet/backoffice.css";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { deleteUser } from "../API/user";
+import { useParams, useNavigate } from "react-router-dom";
 
 //write a button that delete a line from a table, that recieve the name of the table and the id of the line
+ 
 function DeleteButton({id}) {
+
+  
   const [showAlert, setShowAlert] = useState(false);
+  const params = useParams();
+  const Navigate = useNavigate();
+
+  let deleteData = null;
+  console.log(params.name);
+  
+  switch (params.name) {
+    case "users":
+      deleteData = async (id) => {
+        try {
+          await deleteUser(id);
+          // once the user is deleted, reload the page to see the changes
+        } catch (e) {
+          console.log(e);
+        }
+      }; 
+      break;
+  }
+  
   const handleClick = () => {
-    deleteUser(id);
-    setShowAlert(true);
+    deleteData(id);
   };
 
 

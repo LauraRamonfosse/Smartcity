@@ -3,17 +3,21 @@ import '../../stylesheet/backoffice.css'
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';  
+import {sendForm as APISendForm } from '../../API/user';
+import { updateUser, getUserById } from '../../API/user';
 
 function UserForm({content}){
     const params = useParams();
-    const[username, setUsername] = useState(params.type === 'modify' ? content.username : '');
+    const[username, setUsername] = useState('');
     const[password, setPassword] = useState('');
     const[password2, setPassword2] = useState('');
-    const[country, setCountry] = useState(params.type === 'modify' ? content.country : '');  
-    const[email, setEmail] = useState(params.type === 'modify' ? content.email : '');
-    const[phone, setPhone] = useState(params.type === 'modify' ? content.phone : '');
-    const[newsletter, setNewsletter] = useState(params.type === 'modify' ? content.newsletter : false);
+    const[country, setCountry] = useState('');  
+    const[email, setEmail] = useState('');
+    const[role, setRole] = useState('user');
+    const[phone, setPhone] = useState('');
+    const[newsletter, setNewsletter] = useState(false);
     const navigate = useNavigate();
+
 
     const countriesList = [
         'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia',
@@ -41,14 +45,22 @@ function UserForm({content}){
 
     useEffect(() => {
         if(params.type === 'modify'){
-            setUsername(content.username);
-            setPassword(content.password);
-            setPassword2(content.password2);
-            setCountry(content.country);
-            setEmail(content.email);
-            setPhone(content.phone);
-            setNewsletter(content.newsletter);
-            
+            // use getUserById to get the user data from the database
+            console.log('params.id:', params.id);
+            getUserById(parseInt(params.id))
+            .then((response) => {
+                setUsername(response.username);
+                setPassword(response.password);
+                setPassword2(response.password);
+                setCountry(response.country);
+                setEmail(response.email_address);
+                setRole(response.role);
+                setPhone(response.phone_number);
+                setNewsletter(response.news_letter);
+            })
+            .catch((error) => {
+                console.log(error);
+            });           
         }
         else if(params.type === 'add'){
             setUsername('');
@@ -63,29 +75,54 @@ function UserForm({content}){
 
 // write the handleSubmit function here
 async function sendForm (event) {
-    event.preventDefault();
     const formData = new FormData();
-    formData.append('username', username);
-    formData.append('password', password);
-    formData.append('country', country);
-    formData.append('email_address', email);
-    formData.append('phone_number', phone);
-    formData.append('news_letter', newsletter);
-    // formData.append('avatar', avatar.current);
-    try {
-        await APISendForm(formData);
-        console.log('OK');
-        //write the alert here
-        alert('The user has been added to the database');
-    } catch (e) {
-        console.log(e);
+    event.preventDefault();
+    switch (params.type) {
+        case 'add':
+            formData.append('username', username);
+            formData.append('email_address', email);
+            formData.append('password', password);
+            formData.append('country', country);
+            formData.append('role', role);
+            formData.append('phone_number', phone);
+            formData.append('news_letter', newsletter);
+            // formData.append('avatar', avatar.current);
+            try {
+                await APISendForm(formData);
+                console.log('OK');
+                //write the alert here
+                alert('The user has been added to the database');
+                navigate('/users/add');
+            } catch (e) {
+                console.log(e);
+            }
+            break;
+        case 'modify':
+            formData.append('id', params.id);
+            formData.append('username', username);
+            formData.append('email_address', email);
+            formData.append('password', password);
+            formData.append('role', role);
+            formData.append('country', country);
+            formData.append('phone_number', phone);
+            formData.append('news_letter', newsletter);
+            // formData.append('avatar', avatar.current);
+            try {
+                await APIUpdateUser(formData, content.id);
+                console.log('OK');
+                //write the alert here
+                alert('The user has been modified in the database');
+            } catch (e) {
+                console.log(e);
+            }
+            break;
     }
 }
 
     return(
         //write the form here
         <>          
-            <form onSubmit={handleForm}>
+            <form onSubmit={sendForm}>
                     <label className="field">Username:
                         <br/>
                         <input 
@@ -117,6 +154,15 @@ async function sendForm (event) {
                         name="email"
                         placeholder='Insert...' 
                         value={email} onChange={e => setEmail(e.target.value)} />
+                    </label>
+                    <label className="field">Role:
+                        <br/>
+                        <select 
+                        name="role" 
+                        value={role} onChange={e => setRole(e.target.value)}>
+                            <option value="admin">Admin</option>
+                            <option value="user">User</option>
+                        </select>
                     </label>
                     <label className="countryField">Country:
                         <br/>

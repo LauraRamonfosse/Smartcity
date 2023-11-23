@@ -277,7 +277,6 @@ function Acceuil() {
         switch(name){
             case 'users':
                 fetchUserData();
-                
                 break;
             case 'books':
                 setContent(
@@ -321,7 +320,7 @@ function Acceuil() {
                 setContent(<></>);
                 break;
         }
-    }, [name]);
+    }, [name, type]);
 
 
     return (
