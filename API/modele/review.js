@@ -6,7 +6,7 @@ module.exports.postReview = async (client, title, content, user_id, book_id) => 
     return await client.query(`
         INSERT INTO review (date, rating, title, content, likesCounter, dislikesCounter, user_id, book_id)
         VALUES(CURRENT_DATE, 0, $1, $2, 0, 0, $3, $4)
-        `, [title, content, user_id, book_id]);
+        RETURNING id`, [title, content, user_id, book_id]);
 };
 
 module.exports.updateReview = async (client, id, title, newContent) => {
