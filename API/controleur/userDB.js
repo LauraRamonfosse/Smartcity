@@ -10,19 +10,23 @@ module.exports.login = async (req, res) => {
     
 
     const {username, password} = req.body;
+    console.log("username log: ", username);
+    console.log("password log: ", password);
     if(username === undefined || password === undefined){
+        console.log("chiasse");
         res.sendStatus(400);
     } else {
         const client = await pool.connect();
         try {
             const result = (await UserModele.login(client, username));
             const user = result.rows[0];
+            console.log("user: ", user);
             if(user !== undefined && await hash.compareHash(password, user.password)){
                 const {id, role} = user;
                 if (role !== "admin" && role !== "user") {
                     res.sendStatus(404);
                 } else {
-                    const payload = {status: role, value: {id: user.id}};
+                    const payload = {status: role, value: {id}};
                     const token = jwt.sign(
                         payload,
                         process.env.SECRET_TOKEN,
@@ -52,12 +56,13 @@ module.exports.updateUser = async (req, res) => {
         const {rows: users} = await UserModele.getUserById(client, userObj.id);
         const user = users[0];
         let doUpdate = false;
-        if(toUpdate.id !== null && user.role === "admin"){
-            newData.id = parseInt(toUpdate.id);
-        }
-        else{
-            newData.id = userObj.id;
-        }
+        newData.id = toUpdate.id;
+        // if(toUpdate.id !== null && user.role === "admin"){
+        //     newData.id = parseInt(toUpdate.id);
+        // }
+        // else{
+        //     newData.id = userObj.id;
+        // }
 
         if(
             toUpdate.username !== undefined ||
@@ -115,8 +120,9 @@ module.exports.getUserById = async (req, res) => {
             res.sendStatus(400);
         } else {
             const {rows: users} = await UserModele.getUserById(client, id);
-            const user = users[0];
-            if(user !== undefined){
+            if(users.length > 0){
+                const user = users[0];
+                console.log("user: ", user);
                 res.json(user);
             } else {
                 res.sendStatus(404);
