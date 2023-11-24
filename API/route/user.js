@@ -20,7 +20,11 @@ router.post('/', upload.fields([
     {name: 'news_letter', maxCount: 1}
 ]), UserControleur.createUser);
 
-router.post('/login', UserControleur.login);
+router.post('/login',upload.fields([
+    {name: 'username', maxCount: 1},
+    {name: 'password', maxCount: 1}
+]), UserControleur.login);
+
 router.patch('/', upload.fields([
     {name: 'id', maxCount: 1},
     {name: 'username', maxCount: 1},
