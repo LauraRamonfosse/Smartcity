@@ -28,22 +28,22 @@ const getAllUsers = async () => {
 
 const getUserById = async (id) => {
     //return a user
-    const {response, err} = await axios.get(`${userURL}/${id}`);
-    if(err){
-        console.error(err);
-    }
+    const response = await axios.get(`${userURL}/${id}`);
+    console.log("${userURL}/${id}", `${userURL}/${id}`);
     console.log("response: ", response);
-    return response;
+    return response.data;
 }
 
 
 const deleteUser = async (id) => {
     //return a user
-    const {response, err} = await axios.delete(`${userURL}/${id}`);
-    if(err){
-        console.error(err);
-    }
-    return response;
+    try {
+      const response = await axios.get(`${userURL}/${id}`);
+      console.log("response: ", response);
+      return response.data;
+  } catch (err) {
+      console.error(err);
+  }
 }
 
 const updateUser = async (formData) => {
@@ -61,4 +61,19 @@ const updateUser = async (formData) => {
       });
 }
 
-export {sendForm, getAllUsers, getUserById, deleteUser, updateUser};
+const login = async (formData) => {
+    //return a user
+    return await axios.post(`${userURL}/login`, formData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+}
+
+export {sendForm, getAllUsers, getUserById, deleteUser, updateUser, login};
