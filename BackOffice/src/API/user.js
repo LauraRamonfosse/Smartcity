@@ -35,22 +35,22 @@ const getUserById = async (id) => {
 }
 
 
-const deleteUser = async (id) => {
-    //return a user
-    try {
-      const response = await axios.get(`${userURL}/${id}`);
-      console.log("response: ", response);
-      return response.data;
-  } catch (err) {
-      console.error(err);
-  }
+const deleteUser = async (id, token) => {
+    //delete a user
+    return await axios.delete(`${userURL}/${id}`
+    , {
+      headers: {
+        'Authorization' : 'Bearer ' + token
+      }
+    })
 }
 
-const updateUser = async (formData) => {
+const updateUser = async (formData, token) => {
     //return a user
     return await axios.patch(userURL, formData, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
         }
       })
       .then(response => {
@@ -62,18 +62,20 @@ const updateUser = async (formData) => {
 }
 
 const login = async (formData) => {
-    //return a user
-    return await axios.post(`${userURL}/login`, formData, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => {
+    // we get a token
+    console.log("formData: ", formData);
+    return await axios.post(`${userURL}/login`, formData)
+    .then(response => {
+        //get a token and save it in local storage
+        const token = response.data.token;
+        console.log("token api bo: ", token);
+        return response.data;
+    })
+    .catch(error => {
         console.error(error);
-      });
+        return error;
+    });
+
 }
 
 export {sendForm, getAllUsers, getUserById, deleteUser, updateUser, login};

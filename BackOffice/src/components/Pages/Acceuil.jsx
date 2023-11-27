@@ -266,7 +266,7 @@ function Acceuil() {
             setContent(
                 <>
                     <DataTable headers={userHeaders} dataRows={userDataRows}/>
-                    <FormButton type={type} form={<UserForm type={type} content={user}/>}/>
+                    <FormButton type={type} form={<UserForm type={type}/>}/>
                 </>
             );
         } catch (error) {

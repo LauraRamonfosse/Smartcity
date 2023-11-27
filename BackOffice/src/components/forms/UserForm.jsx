@@ -1,12 +1,13 @@
-import { useState } from 'react';
-import '../../stylesheet/backoffice.css'
-import { useNavigate } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
-import { useEffect } from 'react';  
+import '../../stylesheet/backoffice.css';
 import {sendForm as APISendForm } from '../../API/user';
 import { updateUser, getUserById } from '../../API/user';
+import {useParams, useNavigate} from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-function UserForm({content}){
+
+
+function UserForm(){
     const params = useParams();
     const[username, setUsername] = useState('');
     const[password, setPassword] = useState('');
@@ -17,6 +18,7 @@ function UserForm({content}){
     const[phone, setPhone] = useState('');
     const[newsletter, setNewsletter] = useState(false);
     const navigate = useNavigate();
+    const token = useSelector(state => state.auth.token);
 
 
     const countriesList = [
@@ -49,9 +51,10 @@ function UserForm({content}){
             console.log('params.id:', params.id);
             getUserById(parseInt(params.id))
             .then((response) => {
+                console.log('token', token);
                 setUsername(response.username);
-                setPassword(response.password);
-                setPassword2(response.password);
+                setPassword('');
+                setPassword2('');
                 setCountry(response.country);
                 setEmail(response.email_address);
                 setRole(response.role);
@@ -77,6 +80,8 @@ function UserForm({content}){
 async function sendForm (event) {
     const formData = new FormData();
     event.preventDefault();
+    console.log('param.type: ', params.type); // Debug line
+    console.log('token before switch: ', token); // Debug line
     switch (params.type) {
         case 'add':
             formData.append('username', username);
@@ -98,6 +103,8 @@ async function sendForm (event) {
             }
             break;
         case 'modify':
+            console.log('Inside modify'); // Debug line
+            console.log('token: ', token);
             formData.append('id', params.id);
             formData.append('username', username);
             formData.append('email_address', email);
@@ -108,7 +115,7 @@ async function sendForm (event) {
             formData.append('news_letter', newsletter);
             // formData.append('avatar', avatar.current);
             try {
-                await APIUpdateUser(formData, content.id);
+                await updateUser(formData, token);
                 console.log('OK');
                 //write the alert here
                 alert('The user has been modified in the database');
