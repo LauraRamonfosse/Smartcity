@@ -13,7 +13,6 @@ module.exports.login = async (req, res) => {
     console.log("username log: ", username);
     console.log("password log: ", password);
     if(username === undefined || password === undefined){
-        console.log("chiasse");
         res.sendStatus(400);
     } else {
         const client = await pool.connect();
@@ -21,18 +20,27 @@ module.exports.login = async (req, res) => {
             const result = (await UserModele.login(client, username));
             const user = result.rows[0];
             console.log("user: ", user);
+            console.log("compareHash: ", await hash.compareHash(password, user.password));
             if(user !== undefined && await hash.compareHash(password, user.password)){
+                console.log('OKI DOKI');
                 const {id, role} = user;
                 if (role !== "admin" && role !== "user") {
+                    console.log('identification pas OK');
                     res.sendStatus(404);
                 } else {
-                    const payload = {status: role, value: {id}};
+                    
+                    console.log('identification OK');
                     const token = jwt.sign(
-                        payload,
+                        value = {
+                            id: id,
+                            role: role
+                        },
                         process.env.SECRET_TOKEN,
                         {expiresIn: '1d'}
                     );
-                    res.json(token);
+                    req.session = {id, role};
+                    console.log("token: ", token);
+                    res.json({token});
                 }
             }
             else{
@@ -48,21 +56,26 @@ module.exports.login = async (req, res) => {
 }
 
 module.exports.updateUser = async (req, res) => {
-    if(req.session){
         const client = await pool.connect();
         const toUpdate = req.body;
         const newData = {};
         const userObj = req.session;
-        const {rows: users} = await UserModele.getUserById(client, userObj.id);
+        const {rows: users} = await UserModele.getUserById(client, toUpdate.id);
         const user = users[0];
         let doUpdate = false;
         newData.id = toUpdate.id;
-        // if(toUpdate.id !== null && user.role === "admin"){
-        //     newData.id = parseInt(toUpdate.id);
-        // }
-        // else{
-        //     newData.id = userObj.id;
-        // }
+        if(toUpdate.id !== null && user.role === "admin"){
+            console.log("admin");
+            newData.id = parseInt(toUpdate.id);
+        }
+        // if the user is a simple user and want to update his own profile
+        else if(userObj.id === toUpdate.id){
+            console.log("user");
+            newData.id = userObj.id;
+        }
+        else {
+            res.sendStatus(401);
+        }
 
         if(
             toUpdate.username !== undefined ||
@@ -106,9 +119,9 @@ module.exports.updateUser = async (req, res) => {
         } finally {
             client.release();
         }
-    } else {
-        res.sendStatus(401);
-    }
+    // } else {
+    //     res.sendStatus(401);
+    // }
 }
 
 module.exports.getUserById = async (req, res) => {
@@ -200,6 +213,15 @@ module.exports.deleteUser = async (req, res) => {
     const client = await pool.connect();
     const idText = req.params.id;
     const id = parseInt(idText);
+    const userObj = req.session;
+
+    console.log("userObj: ", userObj);
+
+    // if the user is a simple user, he can't delete another user
+    if(userObj.id !== id && userObj.role !== "admin"){
+        res.sendStatus(401);
+    }
+
     try{
         if(isNaN(id)){
             res.sendStatus(400);

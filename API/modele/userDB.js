@@ -21,7 +21,7 @@ module.exports.createUser = async (client, username, password, email_address, ro
 // newData.phoneNumber,
 // newData.newsLetter
 
-module.exports.updateUser = async (client, id, username, emailAdress, password, role, country, phoneNumber, newsLetter) => {
+module.exports.updateUser = async (client, id, username, emailAddress, password, role, country, phoneNumber, newsLetter) => {
 
     const params = [];
     const querySet = [];
@@ -30,9 +30,9 @@ module.exports.updateUser = async (client, id, username, emailAdress, password, 
         params.push(username);
         querySet.push(` username = $${params.length} `);
     }
-    if(emailAdress !== undefined){
-        params.push(emailAdress);
-        querySet.push(` email_adress = $${params.length} `);
+    if(emailAddress !== undefined){
+        params.push(emailAddress);
+        querySet.push(` email_address = $${params.length} `);
     }
     if(password !== undefined){
         params.push(await getHash(password));
@@ -83,6 +83,7 @@ module.exports.getAllUsers = async (client) => {
     return await client.query(`SELECT * FROM account`);
 }
 
-module.exports.login = async (client, username) => {
+module.exports.login = async (client, username) => 
+{
     return await client.query(`SELECT * FROM account WHERE username = $1`, [username]);
 }
