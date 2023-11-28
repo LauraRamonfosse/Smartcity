@@ -10,6 +10,9 @@ module.exports.login = async (req, res) => {
     
 
     const {username, password} = req.body;
+    console.log("username API: ", username);
+    console.log("password API: ", password);
+
     if(username === undefined || password === undefined){
         res.sendStatus(400);
     } else {
@@ -17,17 +20,19 @@ module.exports.login = async (req, res) => {
         try {
             const result = (await UserModele.login(client, username));
             const user = result.rows[0];
+            console.log("user: ", user);
+            console.log("hash.compareHash(password, user.password): ", await hash.compareHash(password, user.password));
+
             if(user !== undefined && await hash.compareHash(password, user.password)){
                 const {id, role} = user;
                 if (role !== "admin" && role !== "user") {
+                    console.log("role not admin or user");
                     res.sendStatus(404);
                 } else {
-                    
+                    console.log("role admin or user");
+                    const payload = {status: role, value: {id}};
                     const token = jwt.sign(
-                        value = {
-                            id: id,
-                            role: role
-                        },
+                        payload,
                         process.env.SECRET_TOKEN,
                         {expiresIn: '1d'}
                     );
@@ -48,6 +53,7 @@ module.exports.login = async (req, res) => {
 }
 
 module.exports.updateUser = async (req, res) => {
+    if(req.session){
         const client = await pool.connect();
         const toUpdate = req.body;
         const newData = {};
@@ -56,18 +62,15 @@ module.exports.updateUser = async (req, res) => {
         const user = users[0];
         let doUpdate = false;
         newData.id = toUpdate.id;
-        if(toUpdate.id !== null && user.role === "admin"){
-            console.log("admin");
-            newData.id = parseInt(toUpdate.id);
-        }
-        // if the user is a simple user and want to update his own profile
-        else if(userObj.id === toUpdate.id){
-            console.log("user");
-            newData.id = userObj.id;
-        }
-        else {
+        // if the user is a simple user and the id is not his id, he can't update another user
+        if(userObj.id !== toUpdate.id && userObj.authLevel !== "admin"){
             res.sendStatus(401);
         }
+        // if the user is a simple user, he can't update the role
+        if(userObj.authLevel !== "admin"){
+            toUpdate.role = user.role;
+        }
+        
 
         if(
             toUpdate.username !== undefined ||
@@ -111,9 +114,9 @@ module.exports.updateUser = async (req, res) => {
         } finally {
             client.release();
         }
-    // } else {
-    //     res.sendStatus(401);
-    // }
+    } else {
+        res.sendStatus(401);
+    }
 }
 
 module.exports.getUserById = async (req, res) => {
@@ -171,9 +174,20 @@ module.exports.getUser = async (req, res) => {
 module.exports.createUser = async (req, res) => {
     const client = await pool.connect();
     const newData = req.body;
-    if (!newData.username) {
-        res.status(400).json(newData.username);
+    const userObj = req.session;
+    if (!newData.username
+        || !newData.password
+        || !newData.email_address
+        || !newData.role
+        || !newData.country
+        || !newData.phone_number
+        || !newData.news_letter
+        ) {
+        res.sendStatus(400);
         return;
+    }
+    if (userObj.role !== "admin") {
+        newData.role = "user";
     }
     try{
         await UserModele.createUser(
@@ -200,28 +214,36 @@ module.exports.createUser = async (req, res) => {
 
 // delete user
 module.exports.deleteUser = async (req, res) => {
-    const client = await pool.connect();
-    const idText = req.params.id;
-    const id = parseInt(idText);
-    const userObj = req.session;
-
-    // if the user is a simple user, he can't delete another user
-    if(userObj.id !== id && userObj.role !== "admin"){
-        res.sendStatus(401);
-    }
-
-    try{
-        if(isNaN(id)){
-            res.sendStatus(400);
-        } else {
-            await UserModele.deleteUser(client, id);
-            res.sendStatus(204);
+    if(req.session){
+        const client = await pool.connect();
+        const idText = req.params.id;
+        const id = parseInt(idText);
+        console.log("id: ", id);
+        const userObj = req.session;
+        console.log("userObj: ", userObj);
+    
+        // if the user is a simple user, he can't delete another user
+        if(userObj.id !== id && userObj.authLevel !== "admin"){
+            console.log("not admin and not allowed");
+            res.sendStatus(401);
         }
-    } catch (error){
-        console.error(error);
-        res.sendStatus(500);
-    } finally {
-        client.release();
+    
+        try{
+            if(isNaN(id)){
+                console.log("id is NaN");
+                res.sendStatus(400);
+            } else {
+                console.log("id is not NaN");
+                await UserModele.deleteUser(client, id);
+                res.sendStatus(204);
+            }
+        } catch (error){
+            console.log("error: ", error);
+            console.error(error);
+            res.sendStatus(500);
+        } finally {
+            client.release();
+        }
     }
 }
 

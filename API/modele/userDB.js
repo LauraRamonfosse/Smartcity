@@ -70,6 +70,9 @@ module.exports.deleteUser = async (client, id) => {
     await client.query('BEGIN');
     //delete all the user's comments
     await client.query(`DELETE FROM comment WHERE user_id = $1`, [id]);
+    // delete all the comments linked to the reviews of the user
+    await client.query(`DELETE FROM comment WHERE review_id IN (SELECT id FROM review WHERE user_id = $1)`, [id]);
+
     //delete reviews
     await client.query(`DELETE FROM review WHERE user_id = $1`, [id]);
     //delete user

@@ -10,7 +10,13 @@ module.exports.identification = async (req, res, next) => {
         try{
             const decodedJwtToken = jwt.verify(jwtToken, process.env.SECRET_TOKEN);
             console.log("decodedJwtToken: ", decodedJwtToken);
+            console.log("decodedJwtToken.value: ", decodedJwtToken.value);
+            console.log("decodedJwtToken.status: ", decodedJwtToken.status);
             req.session = decodedJwtToken.value;
+            console.log("after req.session: ", req.session);
+            req.session.authLevel = decodedJwtToken.status;
+            console.log("after req.session.authLevel: ", req.session.authLevel);
+            console.log("req.session: ", req.session);
             next();
         }
         catch (e) {

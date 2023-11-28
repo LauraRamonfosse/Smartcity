@@ -96,7 +96,9 @@ INSERT INTO account (username, email_address, password, role, country, phone_num
 ('user17', 'user17@example.com', 'hashed_password_23', 'user', 'Netherlands', '+31-20-1234-5678', false, NULL),
 ('user18', 'user18@example.com', 'hashed_password_24', 'user', 'Singapore', '+65-1234-5678', true, NULL),
 ('user19', 'user19@example.com', 'hashed_password_25', 'user', 'Sweden', '+46-8-1234-5678', false, NULL),
-('user20', 'user20@example.com', 'hashed_password_26', 'user', 'Switzerland', '+41-44-1234-5678', true, NULL);
+('user20', 'user20@example.com', 'hashed_password_26', 'user', 'Switzerland', '+41-44-1234-5678', true, NULL),
+('truc', 'truc.coucou@bidule.chose', '$2b$10$7Dw1zrF1WMpgTp5dIW3dOOPLGiaBS/T5dZKGlq9gNYJCz8LzsFTDe', 'admin', 'Belgium', '+42 420/66.76.86', true, null),
+('freddy', 'freddy.mercury@rhapsodia.song', '$2b$10$vht5LespLG4dFE/a6UMpEOy82GWqPjqbgNl1AUac6uWXggSXeROrm', 'user', 'Belgium', '+88 123/18.14.88', false, null);
 
 DROP TABLE IF EXISTS review CASCADE;
 
