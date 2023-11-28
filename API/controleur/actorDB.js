@@ -1,10 +1,11 @@
 const pool = require('../modele/database');
-const roleModele = require('../modele/roleDB');
-module.exports.getRoles = async (req,res) =>{
+const actorModele = require('../modele/actorDB');
+
+module.exports.getAllActors = async(req,res) => {
     const client = await pool.connect();
     try{
-        const {rows : roles} = await roleModele.getRoles(client);
-        res.json(roles);
+        const {rows : actors } = await actorModele.getAllActors(client);
+        res.json(actors);
     }
     catch(error){
         console.log(error);

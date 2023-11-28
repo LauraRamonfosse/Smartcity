@@ -2,8 +2,8 @@ module.exports.getBooks = async (client) => {
     return await client.query("SELECT * FROM book");
 };
 
-module.exports.getBook = async (title, client) => {
-    return await client.query("SELECT * FROM book WHERE title = $1", [title]);
+module.exports.getBookByID = async (ISBN, client) => {
+    return await client.query("SELECT * FROM book WHERE isbn = $1", [ISBN]);
 };
 
 module.exports.insertBook = async (ISBN,title, description, country, genre, releasedYear,nbrOfPages,publishingHouse,bookPicturePath, client) =>{

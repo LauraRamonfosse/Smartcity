@@ -26,7 +26,6 @@ router.post('/login',upload.fields([
 ]), UserControleur.login);
 
 router.patch('/', upload.fields([
-    {name: 'authorization', maxCount: 1},
     {name: 'id', maxCount: 1},
     {name: 'username', maxCount: 1},
     {name: 'email_address', maxCount: 1},
@@ -37,7 +36,6 @@ router.patch('/', upload.fields([
     {name: 'news_letter', maxCount: 1}
 ]), JWTMiddleWare.identification, UserControleur.updateUser);
 router.delete('/:id', upload.fields([
-    {name: 'authorization', maxCount: 1},
     {name: 'username', maxCount: 1},
     {name: 'password', maxCount: 1}
 ]), JWTMiddleWare.identification, UserControleur.deleteUser);

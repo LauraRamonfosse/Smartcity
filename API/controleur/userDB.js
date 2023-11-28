@@ -10,8 +10,6 @@ module.exports.login = async (req, res) => {
     
 
     const {username, password} = req.body;
-    console.log("username log: ", username);
-    console.log("password log: ", password);
     if(username === undefined || password === undefined){
         res.sendStatus(400);
     } else {
@@ -19,17 +17,12 @@ module.exports.login = async (req, res) => {
         try {
             const result = (await UserModele.login(client, username));
             const user = result.rows[0];
-            console.log("user: ", user);
-            console.log("compareHash: ", await hash.compareHash(password, user.password));
             if(user !== undefined && await hash.compareHash(password, user.password)){
-                console.log('OKI DOKI');
                 const {id, role} = user;
                 if (role !== "admin" && role !== "user") {
-                    console.log('identification pas OK');
                     res.sendStatus(404);
                 } else {
                     
-                    console.log('identification OK');
                     const token = jwt.sign(
                         value = {
                             id: id,
@@ -39,7 +32,6 @@ module.exports.login = async (req, res) => {
                         {expiresIn: '1d'}
                     );
                     req.session = {id, role};
-                    console.log("token: ", token);
                     res.json({token});
                 }
             }
@@ -135,7 +127,6 @@ module.exports.getUserById = async (req, res) => {
             const {rows: users} = await UserModele.getUserById(client, id);
             if(users.length > 0){
                 const user = users[0];
-                console.log("user: ", user);
                 res.json(user);
             } else {
                 res.sendStatus(404);
@@ -158,7 +149,6 @@ module.exports.getUser = async (req, res) => {
         try{
             const {rows: users} = await UserModele.getUser(client, userObj.id);
             const user = users[0];
-            console.log(user);
             if(user !== undefined){
                 res.json(user);
             } else {
@@ -214,8 +204,6 @@ module.exports.deleteUser = async (req, res) => {
     const idText = req.params.id;
     const id = parseInt(idText);
     const userObj = req.session;
-
-    console.log("userObj: ", userObj);
 
     // if the user is a simple user, he can't delete another user
     if(userObj.id !== id && userObj.role !== "admin"){

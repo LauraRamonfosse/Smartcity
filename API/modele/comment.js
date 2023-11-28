@@ -4,9 +4,11 @@ module.exports.getComment= async (client, id) => {
 
 module.exports.getAllCommentFromReviewId = async (client, idReview) =>{
     return await client.query(`
-        SELECT *
-        FROM comment
-        WHERE review_id = $1`, [idReview]
+        SELECT a.username, r.title , c.content, c.likes_counter, c.dislikes_counter
+        FROM comment c
+        INNER JOIN account a ON c.user_id = a.id
+        INNER JOIN review r ON c.review_id = r.id
+        WHERE c.review_id = $1`, [idReview]
     );
 }
 
