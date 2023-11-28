@@ -18,11 +18,7 @@ function Login() {
             const formData = new FormData();
             formData.append('username', username);
             formData.append('password', password);
-            console.log('Before login'); // Debug line
             const token = (await login(formData)).token;
-            console.log('After login'); // Debug line
-            console.log('token: ', token);
-            console.log('After context'); // Debug line
             // store the token in the local storage
             // redirect to the home page
             dispatch(setToken(token));
@@ -38,7 +34,6 @@ function Login() {
     // It should clear the form
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Username: ' + username + ' Password: ' + password);
         APILogin();
     };
 

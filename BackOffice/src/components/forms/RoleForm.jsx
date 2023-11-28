@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 
-function RoleForm({content}){
+function RoleForm(){
     const params = useParams();
     const [name, setName] = useState(params.type === 'modify' ? content.name : '');
     const [description, setDescription] = useState(params.type === 'modify' ? content.description : '');

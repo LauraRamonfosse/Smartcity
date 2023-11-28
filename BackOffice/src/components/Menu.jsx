@@ -26,6 +26,8 @@ function Menu() {
           case 'BEST':
             navigate('/best/add');
             break;
+          case 'ACTOR' :
+            navigate('/actors/add');
     }
   };
 
@@ -49,6 +51,9 @@ function Menu() {
           </button>
           <button style={getButtonStyle('ROLE')} onClick={() => handleButtonClick('ROLE')}disabled ={activeButton === 'ROLE'}>
             ROLE
+          </button>
+          <button style={getButtonStyle('ACTOR')} onClick={() => handleButtonClick('ACTOR')}disabled ={activeButton === 'ACTOR'}>
+            ACTOR
           </button>
           <button style={getButtonStyle('BEST')} onClick={() => handleButtonClick('BEST')}disabled ={activeButton === 'BEST'}>
             BEST

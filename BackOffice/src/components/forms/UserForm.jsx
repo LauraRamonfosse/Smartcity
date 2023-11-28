@@ -48,10 +48,8 @@ function UserForm(){
     useEffect(() => {
         if(params.type === 'modify'){
             // use getUserById to get the user data from the database
-            console.log('params.id:', params.id);
             getUserById(parseInt(params.id))
             .then((response) => {
-                console.log('token', token);
                 setUsername(response.username);
                 setPassword('');
                 setPassword2('');
@@ -80,8 +78,6 @@ function UserForm(){
 async function sendForm (event) {
     const formData = new FormData();
     event.preventDefault();
-    console.log('param.type: ', params.type); // Debug line
-    console.log('token before switch: ', token); // Debug line
     switch (params.type) {
         case 'add':
             formData.append('username', username);
@@ -94,7 +90,6 @@ async function sendForm (event) {
             // formData.append('avatar', avatar.current);
             try {
                 await APISendForm(formData);
-                console.log('OK');
                 //write the alert here
                 alert('The user has been added to the database');
                 navigate('/users/add');
@@ -103,8 +98,6 @@ async function sendForm (event) {
             }
             break;
         case 'modify':
-            console.log('Inside modify'); // Debug line
-            console.log('token: ', token);
             formData.append('id', params.id);
             formData.append('username', username);
             formData.append('email_address', email);
@@ -116,7 +109,6 @@ async function sendForm (event) {
             // formData.append('avatar', avatar.current);
             try {
                 await updateUser(formData, token);
-                console.log('OK');
                 //write the alert here
                 alert('The user has been modified in the database');
             } catch (e) {

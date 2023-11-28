@@ -5,6 +5,8 @@ import "reactjs-popup/dist/index.css";
 import "../stylesheet/backoffice.css";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { deleteUser } from "../API/user";
+import { deleteBook } from "../API/book";
+import { deleteReview } from "../API/reviews";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -19,14 +21,12 @@ function DeleteButton({id}) {
   const token = useSelector((state) => state.auth.token);
 
   let deleteData = null;
-  console.log(params.name);
   
   switch (params.name) {
     case "users":
-      deleteData = async (id) => {
+      deleteData = async () => {
         try { 
           await deleteUser(id, token);
-          console.log("OK");
           //write the alert here
           alert("The user has been deleted from the database");
           Navigate("/users/add");
@@ -35,10 +35,31 @@ function DeleteButton({id}) {
         }
       }; 
       break;
-  }
+      case "books" :
+        deleteData = async() =>{
+          try {
+            await deleteBook(id,token);
+            // once the user is deleted, reload the page to see the changes
+            alert("Livre supprimé avec succès");
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      break;
+      case "reviews":
+        deleteData = async (id) => {  
+          try {
+            await deleteReview(id);
+            // once the user is deleted, reload the page to see the changes
+          } catch (e) {
+            console.log(e);
+          }
+        };
+      break;
+      }
   
   const handleClick = () => {
-    deleteData(id);
+    deleteData();
   };
 
 

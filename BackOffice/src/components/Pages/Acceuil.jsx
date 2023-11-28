@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import DataTable from "../DataTable";
 import FormButton from "../FormButton";
 import UserForm from "../forms/UserForm";
@@ -9,242 +10,50 @@ import { BackOfficeLayout } from "../BackOfficeLayout";
 import { useEffect } from "react";
 import { useState } from "react";
 import { getAllUsers } from "../../API/user";
+import { getAllReviews } from "../../API/reviews";
+import { getAllBooks } from "../../API/book";
+import { getAllActors } from "../../API/actor";
+import { getAllRoles } from "../../API/role";
+import { getCommentFromIdReview } from "../../API/comments";
 import "../../stylesheet/backoffice.css";
 
 
 function Acceuil() {
     const {name, type} = useParams();
-    const bookContent = <>
-    <h3>Summary</h3>
-    <p>
-        Nineteen Eighty-Four: A Novel, often published as 1984, is a dystopian social science fiction novel by English novelist George Orwell.
-    </p>
-    <h3>Illustrator</h3>
-    <p>AAAAAAA j'ai mal au doigt </p>
-</>;
-
+    const [content, setContent] = useState(<></>);
+    const [tableKey, setTableKey] = useState(0);
+    const token = useSelector(state => state.auth.token);
+    
     /* USERS */
-    const user = {
-        username: 'Gougougak',
-        country: 'United Kingdom',
-        email: 'Gougouga@aa.a',
-        phone: '123456789',
-        role: 'admin',
-        newsletter: true
-      }
 
 
     const userHeaders = ['ID', 'USERNAME', 'EMAIL', 'PASSWORD', 'COUNTRY', 'PHONE NUMBER', 'NEWSLETTER', 'MODIFY', 'DELETE'] ;
     
-    // const userDataRows = [
-    //     [
-    //         {type: 'text', content: 'CarlosMarcos'},
-    //         {type: 'text', content: 'Gougougagak@gougou.gak'},
-    //         {type: 'text', content: '********'},
-    //         {type: 'text', content: 'france'},
-    //         {type: 'text', content: '0123456789'},
-    //         {type: 'boolean', content: 'true'},
-    //         {type: 'modifyButton', content: 'Modify'},
-    //         {type: 'deleteButton', content: 'Delete'}
-    //     ],
-    //     [
-    //         {type: 'text', content: 'Xx_Darksasuke_xX'},
-    //         {type: 'text', content: 'darkgougougak@a.AAAA'},
-    //         {type: 'text', content: '********'},
-    //         {type: 'text', content: 'belgique'},
-    //         {type: 'text', content: '012345546'},
-    //         {type: 'boolean', content: 'false'},
-    //         {type: 'modifyButton', content: 'Modify'},
-    //         {type: 'deleteButton', content: 'Delete'}
-    //     ]
-    // ];
 
-    /* BOOKS */	
-    const book = {
-        title: '1984',
-        author: 'George Orwell',
-        editor: 'Secker & Warburg',
-        country: 'United Kingdom',
-        pages: '328',
-        year: '1949',
-        isbn: '978-0-452-28423-4',
-        summary: 'Nineteen Eighty-Four: A Novel, often published as 1984, is a dystopian social science fiction novel by English novelist George Orwell.',
-        illustrator: 'AAAAAAA j\'ai mal au doigt',
-        genre: 'Science fiction'
+    /* BOOK */
 
-      };
 
-    const bookHeaders = ['TITLE', 'AUTHOR', 'EDITOR', 'COUNTRY', 'INFOS', 'EVAL', 'PAGES', 'YEAR', 'ISBN', 'MODIFY', 'DELETE'];
+    const bookHeaders = ['ISBN', 'TITLE','RATING', 'AUTHOR','ILLUSTRATOR', 'DESCRIPTION', 'COUNTRY', 'GENRE', 'YEAR', 'PAGES', 'EDITOR','IMG', 'MODIFY', 'DELETE'];
 
-    const bookDataRows = [
-        [
-            {type: 'text', content: '1984'},
-            {type: 'text', content: 'George Orwell'},
-            {type: 'text', content: 'Secker & Warburg'},
-            {type: 'text', content: 'United Kingdom'},
-            {type: 'infosButton', content: bookContent},
-            {type: 'text', content: '4.5'},
-            {type: 'text', content: '328'},
-            {type: 'text', content: '1949'},
-            {type: 'text', content: '978-0-452-28423-4'},
-            {type: 'modifyButton', content: 'Modify'},
-            {type: 'deleteButton', content: 'Delete'}
-        ],
-        [
-            {type: 'text', content: 'The Lord of the Rings'},
-            {type: 'text', content: 'J. R. R. Tolkien'},
-            {type: 'text', content: 'George Allen & Unwin'},
-            {type: 'text', content: 'United Kingdom'},
-            {type: 'infosButton', content: bookContent},
-            {type: 'text', content: '4.8'},
-            {type: 'text', content: '1216'},
-            {type: 'text', content: '29 July 1954'},
-            {type: 'text', content: '978-0-618-26030-0'},
-            {type: 'modifyButton', content: 'Modify'},
-            {type: 'deleteButton', content: 'Delete'}
-        ]
-    ];
 
     /* REVIEWS */
-    const review = {
-        title: 'Gougougak',
-        book: 'Gougougak',
-        text: 'Gougougak'
-      };
 
     const reviewHeaders = ['AUTHOR', 'BOOK', 'CONTENT', 'TITLE', 'COMMENTS', 'RATING', 'EVAL', 'MODIFY', 'DELETE'];
 
-    const reviewDataRows = [
-        [
-            {type: 'text', content: 'Xx_Darksasuke_xX'},
-            {type: 'text', content: '1984'},
-            {type: 'text', content: 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'},
-            {type: 'text', content: 'On vit vraiment dans une saucisse'},
-            {type: 'commentsButton', content: 'link'},
-            {type: 'text', content: '-420'},
-            {type: 'text', content: '4.5'},
-            {type: 'modifyButton', content: 'Modify'},
-            {type: 'deleteButton', content: 'Delete'}
-        ],
-        [
-            {type: 'text', content: 'CarlosMarcos'},
-            {type: 'text', content: 'The Lord of the Rings'},
-            {type: 'text', content: 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'},
-            {type: 'text', content: 'C NUL'},
-            {type: 'commentsButton', content: 'link'},
-            {type: 'text', content: '-69'},
-            {type: 'text', content: '4.8'},
-            {type: 'modifyButton', content: 'Modify'},
-            {type: 'deleteButton', content: 'Delete'}
-        ]
-    ];
 
     /* COMMENTS */
-    const comment = {text: "This is a comment"};
 
     const commentHeaders = ['AUTHOR', 'CONTENT', 'RATING', 'MODIFY', 'DELETE'] ;
 
-    const commentDataRows = [
-        [
-            {type: 'text', content: 'Xx_Darksasuke_xX'},
-            {type: 'text', content: 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'},
-            {type: 'text', content: '-420'},
-            {type: 'modifyButton', content: 'Modify'},
-            {type: 'deleteButton', content: 'Delete'}
-        ],
-        [
-            {type: 'text', content: 'CarlosMarcos'},
-            {type: 'text', content: 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'},
-            {type: 'text', content: '-69'},
-            {type: 'modifyButton', content: 'Modify'},
-            {type: 'deleteButton', content: 'Delete'}
-        ]
-    ];
+
 
     /* ROLES */
-    const role = {
-        name: 'Gougougak',
-        actor: 'Gougougak',
-        book: 'Gougougak'
-      };
 
-    const roleHeaders = ['NAME', 'ACTOR', 'BOOK'] ;
+    const roleHeaders = ['NAME', 'ACTOR', 'BOOK'];
 
-    const roleDataRows = [
-        [
-            {type: 'text', content: 'Author'},
-            {type: 'text', content: 'Goerge Orwell'},
-            {type: 'text', content: '1984'}
-        ],
-        [
-            {type: 'text', content: 'Author'},
-            {type: 'text', content: 'J. R. R. Tolkien'},
-            {type: 'text', content: 'The Lord of the Rings'}
-        ]
-    ];
+    /* ACTOR */
+    const actorHeaders = ["NAME", "BOOKS"];
 
-
-    /* BEST */
-        const bestBook = {
-            title: 'Gougougak',
-            author: 'Gougougak',
-            year: 'Gougougak',
-            genre: 'Gougougak',
-            country: 'usa',
-            pages: 'Gougougak',
-            editor: 'Gougougak',
-            isbn: 'Gougougak',
-            summary: 'Gougougak'    
-          };
-    
-        const bestBookHeaders = ['TITLE', 'AUTHOR', 'EDITOR', 'COUNTRY', 'INFOS', 'EVAL', 'PAGES', 'YEAR', 'ISBN'];
-    
-        const bestBookDataRows = [
-            [
-                {type: 'text', content: '1984'},
-                {type: 'text', content: 'George Orwell'},
-                {type: 'text', content: 'Secker & Warburg'},
-                {type: 'text', content: 'United Kingdom'},
-                {type: 'infosButton', content: bookContent},
-                {type: 'text', content: '4.5'},
-                {type: 'text', content: '328'},
-                {type: 'text', content: '1949'},
-                {type: 'text', content: '978-0-452-28423-4'},
-            ],
-            [
-                {type: 'text', content: 'The Lord of the Rings'},
-                {type: 'text', content: 'J. R. R. Tolkien'},
-                {type: 'text', content: 'George Allen & Unwin'},
-                {type: 'text', content: 'United Kingdom'},
-                {type: 'infosButton', content: bookContent},
-                {type: 'text', content: '4.8'},
-                {type: 'text', content: '1216'},
-                {type: 'text', content: '29 July 1954'},
-                {type: 'text', content: '978-0-618-26030-0'},
-            ]
-        ];
-
-    const [content, setContent] = useState(<></>);
-
-    //write a useEffets that change the content of the page depending on the name in the url
-    //if name = users, then display the users page
-    //if name = books, then display the books page
-    //if name = reviews, then display the reviews page
-    //if name = comments, then display the comments page
-    //if name = roles, then display the roles page
-    //if name = actors, then display the actors page
-    // get all users but make sure to wait until the function is done
-    // before setting the userDataRows
-    // userDataRows.push([
-    //     {type: 'text', content: user.username},
-    //     {type: 'text', content: user.email_address},
-    //     {type: 'text', content: user.password},
-    //     {type: 'text', content: user.country},
-    //     {type: 'text', content: user.phone_number},
-    //     {type: 'boolean', content: user.news_letter},
-    //     {type: 'modifyButton', content: 'Modify'},
-    //     {type: 'deleteButton', content: 'Delete'}
-    // ]);
     const fetchUserData = async () => {
         try {
             const userDataRows = [];
@@ -262,7 +71,6 @@ function Acceuil() {
                     {type: 'deleteButton', content: 'Delete'}
                 ]);
             });
-            console.log("userDataRows", userDataRows);
             setContent(
                 <>
                     <DataTable headers={userHeaders} dataRows={userDataRows}/>
@@ -273,48 +81,218 @@ function Acceuil() {
             console.error("Error fetching data: ", error);
         }
     };
+    const fetchBookData = async() =>{
+        try {
+            const bookDataRows = [];
+            const books = await getAllBooks();
+            books.forEach(book => {
+                bookDataRows.push([
+                    {type: 'text', content: book.isbn},
+                    {type: 'text', content: book.title},
+                    {type: 'text', content: book.rating},
+                    {type: 'text', content: book.author},
+                    {type: 'text', content: book.illustrator? book.illustrator : "none"},
+                    {type: 'text', content: book.description},
+                    {type: 'text', content: book.country},
+                    {type: 'text', content: book.genre},
+                    {type: 'text', content: book.released_year},
+                    {type: 'text', content: book.pages},
+                    {type: 'text', content: book.publishing_house},
+                    {type: 'text', content: book.img_path},
+                    {type: 'modifyButton', content: 'Modify'},
+                    {type: 'deleteButton', content: 'Delete'}
+                ]);
+            });
+            setContent(
+                <>
+                    <DataTable key={tableKey} headers={bookHeaders} dataRows={bookDataRows}/>
+                    <FormButton type={type} form={<BookForm type={type}/>}/>
+                </>
+            );
+            setTableKey((prevKey) => prevKey + 1);
+        } catch (error) {
+            console.error("Error fetching data: ", error);
+        }
+    }
+    const fetchTopRatedBooks = async () => {
+        try {
+            const bookDataRows = [];
+            let books = await getAllBooks();
+    
+            // Trier les livres par ordre décroissant de rating
+            books.sort((a, b) => b.rating - a.rating);
+    
+            // Prendre les 10 meilleurs livres
+            const top10Books = books.slice(0, 10);
+    
+            top10Books.forEach((book) => {
+                bookDataRows.push([
+                    { type: 'text', content: book.title },
+                    { type: 'text', content: book.rating },
+                ]);
+            });
+    
+            setContent(
+                <>
+                    <DataTable key={tableKey} headers={[bookHeaders[1], bookHeaders[2]]} dataRows={bookDataRows} />
+                </>
+            );
+            setTableKey((prevKey) => prevKey + 1);
+        } catch (error) {
+            console.error("Error fetching data: ", error);
+        }
+    };
+    
+
+    
+// Fonction pour regrouper les livres par acteur
+const groupBooksByActor = async () => {
+    const actors = await getAllActors(token);
+    const actorMap = new Map();
+
+    actors.forEach(actor => {
+        const { actor_name, book_name } = actor;
+
+        if (!actorMap.has(actor_name)) {
+            actorMap.set(actor_name, { actor_name, books: [] });
+        }
+
+        if (book_name) {
+            actorMap.get(actor_name).books.push(book_name);
+        }
+    });
+
+    return Array.from(actorMap.values()).map(actor => ({
+        actor_name: actor.actor_name,
+        books: actor.books.join(', ') || "No association to a book"
+    }));
+};
+
+const fetchActorData = async () => {
+    try {
+        const actorDataRows = [];
+        const actorData = await groupBooksByActor();
+
+        actorData.forEach(actor => {
+            actorDataRows.push([
+                { type: 'text', content: actor.actor_name },
+                { type: 'text', content: actor.books },
+            ]);
+        });
+
+        setContent(
+            <>
+                <DataTable key={tableKey} headers={actorHeaders} dataRows={actorDataRows} />
+            </>
+        );
+
+        setTableKey((prevKey) => prevKey + 1);
+    } catch (error) {
+        console.error("Error fetching data: ", error);
+    }
+};
+const fetchRolesData = async() =>{
+    try {
+        const roleDataRows = [];
+        const roles = await getAllRoles(token);
+        roles.forEach(role => {
+            roleDataRows.push([
+                {type: 'text', content: role.role_name},
+                {type: 'text', content: role.actor_name},
+                {type: 'text', content: role.book_title},
+            ]);
+        });
+        setContent(
+            <>
+                <DataTable key={tableKey} headers={roleHeaders} dataRows={roleDataRows}/>
+            </>
+        );
+        setTableKey((prevKey) => prevKey + 1);
+    } catch (error) {
+        console.error("Error fetching data: ", error);
+    }
+}
+
+
+    const fetchReviewData = async () => {
+        try {
+            const reviewDataRows = [];
+            const reviews = await getAllReviews();
+            reviews.forEach(review => {
+                reviewDataRows.push([
+                    {type: 'text', content: review.id},
+                    {type: 'text', content: review.username},
+                    {type: 'text', content: review.isbn},
+                    {type: 'text', content: review.content},
+                    {type: 'text', content: review.title},
+                    {type: 'commentsButton', content: 'link'},
+                    {type: 'text', content: review.likes_counter},
+                    {type: 'text', content: review.rating},
+                    {type: 'modifyButton', content: 'Modify'},
+                    {type: 'deleteButton', content: 'Delete'}
+                ]);
+            });
+            setContent(
+                <>
+                    <DataTable key={tableKey} headers={reviewHeaders} dataRows={reviewDataRows}/>
+                    <FormButton type={type} form={<ReviewForm type={type} />}/>
+                </>
+            );
+            setTableKey((prevKey) => prevKey + 1);
+        } catch (error) {
+            console.error("Error fetching data: ", error);
+        }   
+    };
+
+
+    const fetchCommentData = async (id) => {
+        try {
+            const commentDataRows = [];
+            const comments = await getCommentFromIdReview(id);
+            comments.forEach(comment => {
+                commentDataRows.push([
+                    {type: 'text', content: comment.username},
+                    {type: 'text', content: comment.content},
+                    {type: 'text', content: comment.rating},
+                    {type: 'modifyButton', content: 'Modify'},
+                    {type: 'deleteButton', content: 'Delete'}
+                ]);
+            });
+            setContent(
+                <>
+                    <DataTable key={tableKey} headers={commentHeaders} dataRows={commentDataRows}/>
+                    <FormButton type={type} form={<CommentForm type={type} />}/>
+                </>
+            );
+            setTableKey((prevKey) => prevKey + 1);
+        } catch (error) {
+            console.error("Error fetching data: ", error);
+        }   
+    };
+
+
     useEffect(() => {
         switch(name){
             case 'users':
                 fetchUserData();
                 break;
             case 'books':
-                setContent(
-                    <>
-                        <DataTable headers={bookHeaders} dataRows={bookDataRows}/>
-                        <FormButton type={type} form={<BookForm type={type} content={book}/>}/>
-                    </>
-                );
+                fetchBookData();
+                break;
+            case 'actors' :
+                fetchActorData();
                 break;
             case 'reviews':
-                setContent(
-                    <>
-                        <DataTable headers={reviewHeaders} dataRows={reviewDataRows}/>
-                        <FormButton type={type} form={<ReviewForm type={type} content={review}/>}/>
-                    </>
-                );
+                fetchReviewData();
                 break;
             case 'comments':
-                setContent(
-                    <>
-                        <DataTable headers={commentHeaders} dataRows={commentDataRows}/>
-                        <FormButton type={type} form={<CommentForm type={type} content={comment}/>}/>
-                    </>
-                );
+                fetchCommentData();
                 break;
             case 'roles':
-                setContent(
-                    <>
-                        <DataTable headers={roleHeaders} dataRows={roleDataRows}/>
-                    </>
-                );
+                fetchRolesData();
                 break;
             case 'best':
-                setContent(
-                    <>
-                        <DataTable headers={bestBookHeaders} dataRows={bestBookDataRows}/>
-                    </>
-                );
+                fetchTopRatedBooks();
                 break;
             default:
                 setContent(<></>);

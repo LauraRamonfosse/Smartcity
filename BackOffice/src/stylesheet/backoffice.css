@@ -33,9 +33,9 @@ body {
   border: 2px solid black;
   color: black;
   padding: 8px;
-  min-width: 150px;
-  max-width: 150px;
-  max-height: 50%;
+  min-width: fit-content;
+  max-width: 500px;
+  max-height: 50px;
 }
 
 .dataTable th {
@@ -50,7 +50,11 @@ body {
   background-color: white;
   font-family: 'Open Sans', sans-serif;
   font-size: 85%;
-  word-break: break-all;
+  word-break :normal;
+  /* text-overflow: clip;
+  white-space:nowrap;
+  overflow:auto; */
+  min-height: 50px;
 }
 
 /* Barre des menus */
