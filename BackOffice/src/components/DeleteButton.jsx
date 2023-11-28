@@ -47,7 +47,7 @@ function DeleteButton({id}) {
         }
       break;
       case "reviews":
-        deleteData = async (id) => {  
+        deleteData = async () => {  
           try {
             await deleteReview(id);
             // once the user is deleted, reload the page to see the changes
