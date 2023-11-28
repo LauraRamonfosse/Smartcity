@@ -22,7 +22,7 @@ function Acceuil() {
     const {name, type} = useParams();
     const [content, setContent] = useState(<></>);
     const [tableKey, setTableKey] = useState(0);
-    const token = useSelector(state => state.auth.token);
+    const token = useSelector(state => state.token);
     
     /* USERS */
 
@@ -38,7 +38,7 @@ function Acceuil() {
 
     /* REVIEWS */
 
-    const reviewHeaders = ['AUTHOR', 'BOOK', 'CONTENT', 'TITLE', 'COMMENTS', 'RATING', 'EVAL', 'MODIFY', 'DELETE'];
+    const reviewHeaders = ['ID', 'AUTHOR', 'BOOK', 'CONTENT', 'TITLE', 'COMMENTS', 'RATING', 'EVAL', 'MODIFY', 'DELETE'];
 
 
     /* COMMENTS */
@@ -274,24 +274,31 @@ const fetchRolesData = async() =>{
     useEffect(() => {
         switch(name){
             case 'users':
+                console.log("fetching user data");
                 fetchUserData();
                 break;
             case 'books':
+                console.log("fetching book data");
                 fetchBookData();
                 break;
             case 'actors' :
+                console.log("fetching actor data");
                 fetchActorData();
                 break;
             case 'reviews':
+                console.log("fetching review data");
                 fetchReviewData();
                 break;
             case 'comments':
+                console.log("fetching comment data");
                 fetchCommentData();
                 break;
             case 'roles':
+                console.log("fetching role data");
                 fetchRolesData();
                 break;
             case 'best':
+                console.log("fetching best data");
                 fetchTopRatedBooks();
                 break;
             default:

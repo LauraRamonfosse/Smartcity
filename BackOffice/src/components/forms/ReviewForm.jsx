@@ -9,6 +9,7 @@ import { getReviewById } from '../../API/reviews';
 
 function ReviewForm(){
     const params = useParams();
+    const[user, setUser] = useState('');
     const[book, setBook] = useState('');
     const[title, setTitle] = useState('');
     const[content, setContent] = useState('');
@@ -20,9 +21,12 @@ function ReviewForm(){
         if(params.type === 'modify'){
             getReviewById(parseInt(params.id))
             .then((response) => {
+                setUser(response.user_id);
                 setBook(response.book_id);
                 setTitle(response.title);
                 setContent(response.content);
+                setLikesCounter(response.likes_counter);
+                setDislikesCounter(response.dislikes_counter);
                 setRating(response.rating); 
             }).catch((error) => {
                 console.log(error);

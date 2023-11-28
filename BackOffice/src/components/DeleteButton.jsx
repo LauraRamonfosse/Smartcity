@@ -18,7 +18,7 @@ function DeleteButton({id}) {
   const [showAlert, setShowAlert] = useState(false);
   const params = useParams();
   const Navigate = useNavigate();
-  const token = useSelector((state) => state.auth.token);
+  const token = useSelector((state) => state.token);
 
   let deleteData = null;
   
@@ -47,7 +47,7 @@ function DeleteButton({id}) {
         }
       break;
       case "reviews":
-        deleteData = async () => {  
+        deleteData = async (id) => {  
           try {
             await deleteReview(id);
             // once the user is deleted, reload the page to see the changes

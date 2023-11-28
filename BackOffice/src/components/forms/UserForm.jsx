@@ -18,7 +18,7 @@ function UserForm(){
     const[phone, setPhone] = useState('');
     const[newsletter, setNewsletter] = useState(false);
     const navigate = useNavigate();
-    const token = useSelector(state => state.auth.token);
+    const token = useSelector(state => state.token);
 
 
     const countriesList = [

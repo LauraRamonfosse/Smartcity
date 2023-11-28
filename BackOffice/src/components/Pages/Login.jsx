@@ -21,6 +21,7 @@ function Login() {
             const token = (await login(formData)).token;
             // store the token in the local storage
             // redirect to the home page
+            console.log("token Login: ", token);
             dispatch(setToken(token));
             navigate('/Acceuil');
         } catch (e) {
