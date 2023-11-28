@@ -29,8 +29,6 @@ const getAllUsers = async () => {
 const getUserById = async (id) => {
     //return a user
     const response = await axios.get(`${userURL}/${id}`);
-    console.log("${userURL}/${id}", `${userURL}/${id}`);
-    console.log("response: ", response);
     return response.data;
 }
 
@@ -63,12 +61,10 @@ const updateUser = async (formData, token) => {
 
 const login = async (formData) => {
     // we get a token
-    console.log("formData: ", formData);
     return await axios.post(`${userURL}/login`, formData)
     .then(response => {
         //get a token and save it in local storage
         const token = response.data.token;
-        console.log("token api bo: ", token);
         return response.data;
     })
     .catch(error => {
