@@ -7,8 +7,8 @@ const router = new Router;
 const multer = require("multer");
 const upload = multer();
 
-router.get('/', UserControleur.getAllUsers);
-router.get('/:id', UserControleur.getUserById);
+router.get('/', JWTMiddleWare.identification, UserControleur.getAllUsers);
+router.get('/:id', JWTMiddleWare.identification, UserControleur.getUserById);
 
 router.post('/', upload.fields([
     {name: 'username', maxCount: 1},
@@ -18,7 +18,7 @@ router.post('/', upload.fields([
     {name: 'country', maxCount: 1},
     {name: 'phone_number', maxCount: 1},
     {name: 'news_letter', maxCount: 1}
-]), UserControleur.createUser);
+]), JWTMiddleWare.identification, UserControleur.createUser);
 
 router.post('/login',upload.fields([
     {name: 'username', maxCount: 1},

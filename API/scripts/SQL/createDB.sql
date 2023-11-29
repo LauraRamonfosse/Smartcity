@@ -138,14 +138,15 @@ CREATE TABLE comment(
     user_id integer references account(id)
 );
 
-INSERT INTO comment (content, date, likes_counter, dislikes_counter, review_id) VALUES 
-('Tu as vraiment raison ! Mais je trouve que le livre est un peu trop long', '2021-04-01 12:00:00', 0, 0, 1),
-('Je ne suis pas d accord avec toi, je trouve que le livre est très bien', '2021-04-01 12:00:00', 0, 0, 1),
-('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 2),
-('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 3),
-('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 4),
-('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 5),
-('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 6),
-('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 7),
-('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 8),
-('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 9);
+INSERT INTO comment (content, date, likes_counter, dislikes_counter, review_id, user_id) VALUES 
+('Tu as vraiment raison ! Mais je trouve que le livre est un peu trop long', '2021-04-01 12:00:00', 0, 0, 1, 2),
+('Je ne suis pas d accord avec toi, je trouve que le livre est très bien', '2021-04-01 12:00:00', 0, 0, 1, 2),
+('c''est ouf, je trouve que le livre est très bien', '2021-04-01 12:00:00', 0, 0, 1, 2),
+('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 2, 2),
+('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 3, 2),
+('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 4, 2),
+('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 5, 2),
+('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 6, 2),
+('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 7, 2),
+('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 8, 2),
+('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 9, 2);

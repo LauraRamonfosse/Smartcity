@@ -1,6 +1,6 @@
 const AuthoMiddleware = require("../middleware/Authorization");
 const JWTMiddleWare = require("../middleware/IdentificationJWT");
-const CommentController = require('../controleur/comments');
+const CommentController = require('../controleur/commentDB');
 
 const Router = require("express-promise-router");
 const router = new Router;
