@@ -57,6 +57,7 @@ function CommentForm(){
                 }
                 break;
         }
+        navigate(0);
     }
 
     return(

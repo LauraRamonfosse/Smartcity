@@ -20,15 +20,25 @@ const sendForm = async (formData) => {
 };
 
 
-const getAllUsers = async () => {
+const getAllUsers = async (token) => {
     //return an array of users
-    const response = await axios.get(userURL);
+    const response = await axios.get(userURL, 
+      {
+      headers: {
+        'Authorization' : 'Bearer ' + token
+      }
+    });
     return response.data;
 };
 
-const getUserById = async (id) => {
+const getUserById = async (id, token) => {
     //return a user
-    const response = await axios.get(`${userURL}/${id}`);
+    const response = await axios.get(`${userURL}/${id}`, 
+    {
+    headers: {
+      'Authorization' : 'Bearer ' + token
+    }
+  });
     return response.data;
 }
 

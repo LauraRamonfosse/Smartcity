@@ -21,14 +21,18 @@ const sendForm = async (formData,token) => {
 
 
 
-const getAllBooks = async () => {
+const getAllBooks = async (token) => {
 
-    const response = await axios.get(bookURL);
+    const response = await axios.get(bookURL, {
+      headers: {
+        'Authorization' : 'Bearer ' + token
+      }
+    });
     return response.data;
 };
 
 
-const getBookById = async (id) => {
+const getBookById = async (id, token) => {
 
   const response = await axios.get(`${bookURL}/${id}`);
   console.log("${userURL}/${id}", `${bookURL}/${id}`);

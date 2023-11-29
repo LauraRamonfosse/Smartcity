@@ -49,7 +49,7 @@ function Acceuil() {
 
     /* ROLES */
 
-    const roleHeaders = ['NAME', 'ACTOR', 'BOOK'];
+    const roleHeaders = ['ID', 'NAME', 'ACTOR', 'BOOK'];
 
     /* ACTOR */
     const actorHeaders = ["NAME", "BOOKS"];
@@ -57,7 +57,7 @@ function Acceuil() {
     const fetchUserData = async () => {
         try {
             const userDataRows = [];
-            const users = await getAllUsers();
+            const users = await getAllUsers(token);
             users.forEach(user => {
                 userDataRows.push([
                     {type: 'text', content: user.id},
@@ -74,7 +74,7 @@ function Acceuil() {
             setContent(
                 <>
                     <DataTable headers={userHeaders} dataRows={userDataRows}/>
-                    <FormButton type={type} form={<UserForm type={type}/>}/>
+                    <FormButton type={(type ? type : 'add')} name={name} form={<UserForm type={type}/>}/>
                 </>
             );
         } catch (error) {
@@ -84,7 +84,7 @@ function Acceuil() {
     const fetchBookData = async() =>{
         try {
             const bookDataRows = [];
-            const books = await getAllBooks();
+            const books = await getAllBooks(token);
             books.forEach(book => {
                 bookDataRows.push([
                     {type: 'text', content: book.isbn},
@@ -106,35 +106,7 @@ function Acceuil() {
             setContent(
                 <>
                     <DataTable key={tableKey} headers={bookHeaders} dataRows={bookDataRows}/>
-                    <FormButton type={type} form={<BookForm type={type}/>}/>
-                </>
-            );
-            setTableKey((prevKey) => prevKey + 1);
-        } catch (error) {
-            console.error("Error fetching data: ", error);
-        }
-    }
-    const fetchTopRatedBooks = async () => {
-        try {
-            const bookDataRows = [];
-            let books = await getAllBooks();
-    
-            // Trier les livres par ordre décroissant de rating
-            books.sort((a, b) => b.rating - a.rating);
-    
-            // Prendre les 10 meilleurs livres
-            const top10Books = books.slice(0, 10);
-    
-            top10Books.forEach((book) => {
-                bookDataRows.push([
-                    { type: 'text', content: book.title },
-                    { type: 'text', content: book.rating },
-                ]);
-            });
-    
-            setContent(
-                <>
-                    <DataTable key={tableKey} headers={[bookHeaders[1], bookHeaders[2]]} dataRows={bookDataRows} />
+                    <FormButton type={(type ? type : 'add')} name={name} form={<BookForm type={type}/>}/>
                 </>
             );
             setTableKey((prevKey) => prevKey + 1);
@@ -143,75 +115,74 @@ function Acceuil() {
         }
     };
     
+    // Fonction pour regrouper les livres par acteur
+    const groupBooksByActor = async () => {
+        const actors = await getAllActors(token);
+        const actorMap = new Map();
 
-    
-// Fonction pour regrouper les livres par acteur
-const groupBooksByActor = async () => {
-    const actors = await getAllActors(token);
-    const actorMap = new Map();
+        actors.forEach(actor => {
+            const { actor_name, book_name } = actor;
 
-    actors.forEach(actor => {
-        const { actor_name, book_name } = actor;
+            if (!actorMap.has(actor_name)) {
+                actorMap.set(actor_name, { actor_name, books: [] });
+            }
 
-        if (!actorMap.has(actor_name)) {
-            actorMap.set(actor_name, { actor_name, books: [] });
-        }
-
-        if (book_name) {
-            actorMap.get(actor_name).books.push(book_name);
-        }
-    });
-
-    return Array.from(actorMap.values()).map(actor => ({
-        actor_name: actor.actor_name,
-        books: actor.books.join(', ') || "No association to a book"
-    }));
-};
-
-const fetchActorData = async () => {
-    try {
-        const actorDataRows = [];
-        const actorData = await groupBooksByActor();
-
-        actorData.forEach(actor => {
-            actorDataRows.push([
-                { type: 'text', content: actor.actor_name },
-                { type: 'text', content: actor.books },
-            ]);
+            if (book_name) {
+                actorMap.get(actor_name).books.push(book_name);
+            }
         });
 
-        setContent(
-            <>
-                <DataTable key={tableKey} headers={actorHeaders} dataRows={actorDataRows} />
-            </>
-        );
+        return Array.from(actorMap.values()).map(actor => ({
+            actor_name: actor.actor_name,
+            books: actor.books.join(', ') || "No association to a book"
+        }));
+    };
 
-        setTableKey((prevKey) => prevKey + 1);
-    } catch (error) {
-        console.error("Error fetching data: ", error);
+    const fetchActorData = async () => {
+        try {
+            const actorDataRows = [];
+            const actorData = await groupBooksByActor();
+
+            actorData.forEach(actor => {
+                actorDataRows.push([
+                    { type: 'text', content: actor.actor_name },
+                    { type: 'text', content: actor.books },
+                ]);
+            });
+
+            setContent(
+                <>
+                    <DataTable key={tableKey} headers={actorHeaders} dataRows={actorDataRows} />
+                </>
+            );
+
+            setTableKey((prevKey) => prevKey + 1);
+        } catch (error) {
+            console.error("Error fetching data: ", error);
+        }
+    };
+    const fetchRolesData = async() =>{
+        try {
+            const roleDataRows = [];
+            const roles = await getAllRoles(token);
+            roles.forEach(role => {
+                roleDataRows.push([
+                    {type: 'text', content: role.id},
+                    {type: 'text', content: role.role_name},
+                    {type: 'text', content: role.actor_name},
+                    {type: 'text', content: role.book_title},
+                ]);
+            });
+            setContent(
+                <>
+                    <DataTable key={tableKey} headers={roleHeaders} dataRows={roleDataRows}/>
+                </>
+            );
+            setTableKey((prevKey) => prevKey + 1);
+        } catch (error) {
+            console.error("Error fetching data: ", error);
+        }
     }
-};
-const fetchRolesData = async() =>{
-    try {
-        const roleDataRows = [];
-        const roles = await getAllRoles(token);
-        roles.forEach(role => {
-            roleDataRows.push([
-                {type: 'text', content: role.role_name},
-                {type: 'text', content: role.actor_name},
-                {type: 'text', content: role.book_title},
-            ]);
-        });
-        setContent(
-            <>
-                <DataTable key={tableKey} headers={roleHeaders} dataRows={roleDataRows}/>
-            </>
-        );
-        setTableKey((prevKey) => prevKey + 1);
-    } catch (error) {
-        console.error("Error fetching data: ", error);
-    }
-}
 
 
     const fetchReviewData = async () => {
@@ -268,6 +239,35 @@ const fetchRolesData = async() =>{
         } catch (error) {
             console.error("Error fetching data: ", error);
         }   
+    };
+
+    const fetchTopRatedBooks = async () => {
+        try {
+            const bookDataRows = [];
+            let books = await getAllBooks(token);
+    
+            // Trier les livres par ordre décroissant de rating
+            books.sort((a, b) => b.rating - a.rating);
+    
+            // Prendre les 10 meilleurs livres
+            const top10Books = books.slice(0, 10);
+    
+            top10Books.forEach((book) => {
+                bookDataRows.push([
+                    { type: 'text', content: book.title },
+                    { type: 'text', content: book.rating },
+                ]);
+            });
+    
+            setContent(
+                <>
+                    <DataTable key={tableKey} headers={[bookHeaders[1], bookHeaders[2]]} dataRows={bookDataRows} />
+                </>
+            );
+            setTableKey((prevKey) => prevKey + 1);
+        } catch (error) {
+            console.error("Error fetching data: ", error);
+        }
     };
 
 

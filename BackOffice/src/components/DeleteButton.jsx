@@ -7,7 +7,7 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import { deleteUser } from "../API/user";
 import { deleteBook } from "../API/book";
 import { deleteReview } from "../API/reviews";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate} from "react-router-dom";
 import { useSelector } from "react-redux";
 
 //write a button that delete a line from a table, that recieve the name of the table and the id of the line
@@ -17,8 +17,9 @@ function DeleteButton({id}) {
   
   const [showAlert, setShowAlert] = useState(false);
   const params = useParams();
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const token = useSelector((state) => state.token);
+  
 
   let deleteData = null;
   
@@ -26,10 +27,14 @@ function DeleteButton({id}) {
     case "users":
       deleteData = async () => {
         try { 
-          await deleteUser(id, token);
-          //write the alert here
-          alert("The user has been deleted from the database");
-          Navigate("/users/add");
+          // delete the user from the database but make sure it the delete is done before reloading the page
+          await (deleteUser(id, token))
+          .then(() => location.reload())
+          .catch((e) => console.log(e));
+          // once the user is deleted, reload the page to see the changes
+          alert("Utilisateur supprimé avec succès");
+          
+          navigate(0);
         } catch (e) {
           console.log(e);
         }

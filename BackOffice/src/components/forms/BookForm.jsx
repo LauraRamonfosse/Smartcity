@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { useSelector } from "react-redux";
 import { bookSchema } from './ValidationSchemas';
 import { sendForm as APISendForm, updateBook as APIUpdateBook, getBookById } from '../../API/book'
+import {countriesList} from '../Countries';
 
 function BookForm(){
     const params = useParams();
@@ -23,35 +24,13 @@ function BookForm(){
     const[illustrator, setIllustrator] = useState('');
     const[image, setImage] = useState('');
     const navigate = useNavigate();
-    const token = useSelector(state => state.auth.token);
+    const token = useSelector(state => state.token);
 
-    const countriesList = [
-        'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia',
-        'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin',
-        'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi',
-        'Cabo Verde', 'Cambodia', 'Cameroon', 'Canada', 'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia',
-        'Comoros', 'Congo (Congo-Brazzaville)', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czechia (Czech Republic)',
-        'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador', 'Equatorial Guinea', 'Eritrea',
-        'Estonia', 'Eswatini (fmr. "Swaziland")', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Gabon', 'Gambia', 'Georgia', 'Germany',
-        'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti', 'Holy See', 'Honduras', 'Hungary',
-        'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan',
-        'Kenya', 'Kiribati', 'Kuwait', 'Kyrgyzstan', 'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Liechtenstein',
-        'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania',
-        'Mauritius', 'Mexico', 'Micronesia', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco', 'Mozambique', 'Myanmar (formerly Burma)',
-        'Namibia', 'Nauru', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'North Korea', 'North Macedonia (formerly Macedonia)',
-        'Norway', 'Oman', 'Pakistan', 'Palau', 'Palestine State', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland',
-        'Portugal', 'Qatar', 'Romania', 'Russia', 'Rwanda', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'Samoa',
-        'San Marino', 'Sao Tome and Principe', 'Saudi Arabia', 'Senegal', 'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia',
-        'Slovenia', 'Solomon Islands', 'Somalia', 'South Africa', 'South Korea', 'South Sudan', 'Spain', 'Sri Lanka', 'Sudan', 'Suriname',
-        'Sweden', 'Switzerland', 'Syria', 'Tajikistan', 'Tanzania', 'Thailand', 'Timor-Leste', 'Togo', 'Tonga', 'Trinidad and Tobago', 'Tunisia',
-        'Turkey', 'Turkmenistan', 'Tuvalu', 'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States of America', 'Uruguay',
-        'Uzbekistan', 'Vanuatu', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe',
-      ];
 
     useEffect(() => {
         if(params.type === 'modify'){
             
-                getBookById(params.id)
+                getBookById(params.id, token)
                 .then((response) => {
                     setTitle(response.title);
                     setAuthor(response.author);
@@ -72,18 +51,18 @@ function BookForm(){
             }
             else if(params.type === 'add')
             {
-                setTitle(undefined);
-                setAuthor(undefined);
-                setYear(undefined);
-                setGenre(undefined);
-                setCountry(undefined);
-                setPages(undefined);
-                setEditor(undefined);
-                setIsbn(undefined);
-                setSummary(undefined);
-                setIllustrator(undefined);
-                setImage(undefined);
-                setRating(undefined);
+                setTitle('');
+                setAuthor('');
+                setYear('');
+                setGenre('');
+                setCountry('');
+                setPages('');
+                setEditor('');
+                setIsbn('');
+                setSummary('');
+                setIllustrator('');
+                setImage('');
+                setRating('');
             }
     }, [params.type]);
 
@@ -107,32 +86,21 @@ async function sendForm (event) {
       illustrator,
       image,
     });
-    // empty the form
-    setTitle(undefined);
-    setAuthor(undefined);
-    setYear(undefined);
-    setGenre(undefined);
-    setCountry(undefined);
-    setPages(undefined);
-    setEditor(undefined);
-    setIsbn(undefined);
-    setSummary(undefined);
-    setIllustrator(undefined);
-    setRating(undefined);
-    switch (params.type) {
-        case 'add':
-            formData.append('isbn', isbn);
-            formData.append('title', title);
-            formData.append('author', author);
-            formData.append('released_year', year);
-            formData.append('genre', genre);
-            formData.append('country', country);
-            formData.append('pages', pages);
-            formData.append('description', summary);
-            formData.append('illustrator', illustrator);
-            formData.append('publishing_house', editor);
-            formData.append('img_path', image);
-            console.log("COUNTRY : ", country);
+    formData.append('isbn', isbn);
+    formData.append('title', title);
+    formData.append('author', author);
+    formData.append('released_year', year);
+    formData.append('genre', genre);
+    formData.append('country', country);
+    formData.append('pages', pages);
+    formData.append('description', summary);
+    formData.append('illustrator', illustrator);
+    formData.append('publishing_house', editor);
+    formData.append('img_path', image);
+
+        if(params.type === 'add'){
+
+        
             try {
                 await APISendForm(formData, token);
                 alert('The book has been added to the database')
@@ -143,19 +111,9 @@ async function sendForm (event) {
                 // Affichez une alerte ou effectuez toute autre action en cas d'erreur
                 alert('Failed to add the book. Please check your input and try again.');
             }
-        case 'modify':
-            console.log("params.isbn : ", typeof(params.id));
-            formData.append('isbn', params.id);
-            formData.append('title', title);
-            formData.append('author', author);
-            formData.append('released_year', year);
-            formData.append('genre', genre);
-            formData.append('country', country);
-            formData.append('pages', pages);
-            formData.append('description', summary);
-            formData.append('illustrator', illustrator);
-            formData.append('publishing_house', editor);
-            formData.append('img_path', image);
+            navigate(0);
+        }
+        else if(params.type === 'modify'){
             // formData.append('avatar', avatar.current);
             try {
                 await APIUpdateBook(formData,token);
@@ -165,7 +123,6 @@ async function sendForm (event) {
             } catch (e) {
                 console.log(e);
             }
-            break;
         }
     }
     catch (error) {
@@ -188,9 +145,6 @@ async function sendForm (event) {
           alert('Please, fill in all the mandatory fields.');
         }
       }
-      
-      
-      
 }
 
     return(
@@ -221,7 +175,7 @@ async function sendForm (event) {
                             value={country} 
                             onChange={e => setCountry(e.target.value)}
                         >
-                            <option value="">Select a country</option> {/* Ajoutez cette ligne */}
+                            <option value="">Select a country</option>
                             {
                                 countriesList.map((country) => (
                                     <option key={country} value={country}>{country}</option>

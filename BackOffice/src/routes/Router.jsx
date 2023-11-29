@@ -5,6 +5,10 @@ import { createBrowserRouter } from "react-router-dom";
 
 const router = createBrowserRouter([
     {
+        path: "/:name",
+        element: <Acceuil/>
+    },
+    {
         path: "/:name/:type",
         element: <Acceuil/>
     },

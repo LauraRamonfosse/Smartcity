@@ -19,13 +19,16 @@ function Login() {
             formData.append('username', username);
             formData.append('password', password);
             const token = (await login(formData)).token;
-            // store the token in the local storage
-            // redirect to the home page
-            console.log("token Login: ", token);
-            dispatch(setToken(token));
-            navigate('/Acceuil');
+            if(token !== undefined){
+                console.log("token Login: ", token);
+                dispatch(setToken(token));
+                navigate('/Acceuil');
+            } else {
+                alert('Wrong username or password');
+            }
+            
         } catch (e) {
-            alert('Wrong username or password');
+            alert('Server error');
         }
     };
 

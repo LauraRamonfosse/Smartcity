@@ -12,22 +12,22 @@ function Menu() {
 
         switch(buttonName) {
           case 'USER':
-            navigate('/users/add');
+            navigate('/users');
             break;
           case 'BOOK':
-            navigate('/books/add');
+            navigate('/books');
             break;
           case 'REVIEW':
-            navigate('/reviews/add');
+            navigate('/reviews');
             break;
           case 'ROLE':
-            navigate('/roles/add');
+            navigate('/roles');
             break;
           case 'BEST':
-            navigate('/best/add');
+            navigate('/best');
             break;
           case 'ACTOR' :
-            navigate('/actors/add');
+            navigate('/actors');
     }
   };
 

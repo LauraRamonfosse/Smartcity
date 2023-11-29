@@ -73,6 +73,7 @@ function ReviewForm(){
                 }
                 break;             
         }
+        navigate(0);
     }
 
     return(
