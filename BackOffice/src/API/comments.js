@@ -8,7 +8,7 @@ const sendForm = async (formData) => {
         }
       })
       .then(response => {
-        console.log(response);
+        console.log("response: ", response);
       })
       .catch(error => {
         console.error(error);
@@ -22,8 +22,9 @@ const getComment = async () => {
     return response.data;
 };
 
-const getCommentFromIdReview = async (id) => {    
-    const response = await axios.get(`${commentURL}/${id}`);
+const getCommentsFromIdReview = async (id) => {    
+    const response = await axios.get(`${commentURL}/all/${id}`);
+    console.log("response get: ", response);
     return response.data;
 };
 
@@ -50,4 +51,4 @@ const updateComment = async (id, formData) => {
       });
 };
 
-export {sendForm, getComment, getCommentFromIdReview, deleteComment, updateComment};
+export {sendForm, getComment, getCommentsFromIdReview, deleteComment, updateComment};

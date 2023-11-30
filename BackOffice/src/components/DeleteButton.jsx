@@ -22,17 +22,15 @@ function DeleteButton({id}) {
   
 
   let deleteData = null;
-  
   switch (params.name) {
     case "users":
       deleteData = async () => {
         try { 
           // delete the user from the database but make sure it the delete is done before reloading the page
-          await (deleteUser(id, token))
-          .then(() => location.reload())
-          .catch((e) => console.log(e));
+          await (deleteUser(id, token));
           // once the user is deleted, reload the page to see the changes
           alert("Utilisateur supprimé avec succès");
+          return response;
           
           navigate(0);
         } catch (e) {
@@ -46,6 +44,7 @@ function DeleteButton({id}) {
             await deleteBook(id,token);
             // once the user is deleted, reload the page to see the changes
             alert("Livre supprimé avec succès");
+            return response;
           } catch (e) {
             console.log(e);
           }
@@ -55,6 +54,7 @@ function DeleteButton({id}) {
         deleteData = async (id) => {  
           try {
             await deleteReview(id);
+            return response;
             // once the user is deleted, reload the page to see the changes
           } catch (e) {
             console.log(e);
@@ -65,6 +65,7 @@ function DeleteButton({id}) {
   
   const handleClick = () => {
     deleteData();
+
   };
 
 

@@ -51,7 +51,7 @@ const BackOfficeLayout = ({content}) => {
           textAlign: 'center',
         }}
       >
-        Ant Design ©2023 Created by Ant UED
+        ADA Review ©2023 All rights reserved
       </Footer>
     </Layout>
   );

@@ -17,6 +17,10 @@ const router = createBrowserRouter([
         element: <Acceuil/>
     },
     {
+        path: "/:name/:type/:id_review/:id_comment",
+        element: <Acceuil/>
+    },
+    {
         path: "/acceuil",
         element: <Acceuil/>
     },

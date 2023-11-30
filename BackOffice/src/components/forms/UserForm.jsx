@@ -2,9 +2,10 @@ import '../../stylesheet/backoffice.css';
 import {sendForm as APISendForm } from '../../API/user';
 import { updateUser, getUserById } from '../../API/user';
 import {useParams, useNavigate} from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import {countriesList} from '../Countries';
+import countriesList from '../Countries';
+import { userSchema } from './ValidationSchemas';
 
 
 
@@ -18,10 +19,10 @@ function UserForm(){
     const[role, setRole] = useState('user');
     const[phone, setPhone] = useState('');
     const[newsletter, setNewsletter] = useState(false);
+    const avatar = useRef(null);
+
     const navigate = useNavigate();
     const token = useSelector(state => state.token);
-
-
 
     useEffect(() => {
         if(params.type === 'modify'){
@@ -64,10 +65,20 @@ async function sendForm (event) {
     formData.append('country', country);
     formData.append('phone_number', phone);
     formData.append('news_letter', newsletter);
+    formData.append('profile_picture_path', avatar.current);
     if(params.type === 'add'){
             // formData.append('avatar', avatar.current);
             try {
-                await APISendForm(formData);
+                userSchema.parse({
+                    username,
+                    email_address: email,
+                    password,
+                    role,
+                    country,
+                    phone_number: phone,
+                    news_letter: newsletter
+                });
+                await APISendForm(formData, token);
                 //write the alert here
                 alert('The user has been added to the database');
                 navigate(0);
@@ -155,6 +166,14 @@ async function sendForm (event) {
                         name="phone" 
                         placeholder='Insert...'
                         value={phone} onChange={e => setPhone(e.target.value)} />
+                    </label>
+                    <label className="field">Avatar:
+                        <br/>
+                        <input 
+                        type={'file'}
+                        accept={'image/*'}
+                        onChange={(e) => avatar.current = e.target.files[0]}
+                        ref={avatar} />
                     </label>
                     <label className="field"> 
                         <input 

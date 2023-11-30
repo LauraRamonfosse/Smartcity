@@ -67,7 +67,7 @@ function DataTable({ headers, dataRows }) {
                         </Popover>
                       </>
                     ) : dr.type === "commentsButton" ? (
-                      <Link to='/comments/add'><FaLink /></Link>
+                      <Link to={'/comments/add/' + dataRow[0].content} ><FaLink /></Link>
                     ) : (dr.content ? (
                       <FaRegCheckCircle />
                     ) : (

@@ -1,4 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Karla:wght@700&display=swap');
+@font-face {
+  font-family: 'Karla';
+  font-style: normal;
+  font-weight: 700;
+  src: url('./fonts/Karla/static/Karla-Bold.ttf') format('woff2');
+}
 /* Code pour spécifier la couleur de fond de la page */
 
 body {
@@ -51,9 +56,6 @@ body {
   font-family: 'Open Sans', sans-serif;
   font-size: 85%;
   word-break :normal;
-  /* text-overflow: clip;
-  white-space:nowrap;
-  overflow:auto; */
   min-height: 50px;
 }
 

@@ -14,12 +14,12 @@ import { getAllReviews } from "../../API/reviews";
 import { getAllBooks } from "../../API/book";
 import { getAllActors } from "../../API/actor";
 import { getAllRoles } from "../../API/role";
-import { getCommentFromIdReview } from "../../API/comments";
+import { getCommentsFromIdReview } from "../../API/comments";
 import "../../stylesheet/backoffice.css";
 
 
 function Acceuil() {
-    const {name, type} = useParams();
+    const {name, type, id} = useParams();
     const [content, setContent] = useState(<></>);
     const [tableKey, setTableKey] = useState(0);
     const token = useSelector(state => state.token);
@@ -43,7 +43,7 @@ function Acceuil() {
 
     /* COMMENTS */
 
-    const commentHeaders = ['AUTHOR', 'CONTENT', 'RATING', 'MODIFY', 'DELETE'] ;
+    const commentHeaders = ['ID', 'AUTHOR', 'CONTENT', 'RATING', 'MODIFY', 'DELETE'] ;
 
 
 
@@ -219,12 +219,13 @@ function Acceuil() {
     const fetchCommentData = async (id) => {
         try {
             const commentDataRows = [];
-            const comments = await getCommentFromIdReview(id);
+            const comments = await getCommentsFromIdReview(id);
             comments.forEach(comment => {
                 commentDataRows.push([
+                    {type: 'text', content: comment.id},
                     {type: 'text', content: comment.username},
                     {type: 'text', content: comment.content},
-                    {type: 'text', content: comment.rating},
+                    {type: 'text', content: (comment.likes_counter - comment.dislikes_counter)},
                     {type: 'modifyButton', content: 'Modify'},
                     {type: 'deleteButton', content: 'Delete'}
                 ]);
@@ -291,7 +292,7 @@ function Acceuil() {
                 break;
             case 'comments':
                 console.log("fetching comment data");
-                fetchCommentData();
+                fetchCommentData(id);
                 break;
             case 'roles':
                 console.log("fetching role data");

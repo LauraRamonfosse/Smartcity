@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { useSelector } from "react-redux";
 import { bookSchema } from './ValidationSchemas';
 import { sendForm as APISendForm, updateBook as APIUpdateBook, getBookById } from '../../API/book'
-import {countriesList} from '../Countries';
+import countriesList from '../Countries';
 
 function BookForm(){
     const params = useParams();
@@ -32,6 +32,7 @@ function BookForm(){
             
                 getBookById(params.id, token)
                 .then((response) => {
+                    console.log("response: ", response);
                     setTitle(response.title);
                     setAuthor(response.author);
                     setYear(response.released_year.toString());
@@ -46,7 +47,7 @@ function BookForm(){
                     setRating(response.rating);
                 })
                 .catch((error) => {
-                    console.log(error);
+                    console.log("error: ", error);
                 });
             }
             else if(params.type === 'add')
@@ -70,6 +71,7 @@ function BookForm(){
 // write the handleSubmit function here
 async function sendForm (event) {
     const formData = new FormData();
+    console.log("sendForm");
     event.preventDefault();
       // Validate form data
   try {
@@ -86,6 +88,7 @@ async function sendForm (event) {
       illustrator,
       image,
     });
+    console.log("send form 2");
     formData.append('isbn', isbn);
     formData.append('title', title);
     formData.append('author', author);
@@ -96,12 +99,16 @@ async function sendForm (event) {
     formData.append('description', summary);
     formData.append('illustrator', illustrator);
     formData.append('publishing_house', editor);
-    formData.append('img_path', image);
+    formData.append('image', image);
+    console.log("formData: ", formData);
+    console.log("send form 3");
+    console.log("params.type: ", params.type);
 
         if(params.type === 'add'){
 
-        
+            console.log("send form 4");
             try {
+                console.log("send form 5");
                 await APISendForm(formData, token);
                 alert('The book has been added to the database')
             } catch (error) {
@@ -116,6 +123,7 @@ async function sendForm (event) {
         else if(params.type === 'modify'){
             // formData.append('avatar', avatar.current);
             try {
+                console.log("token update", token);
                 await APIUpdateBook(formData,token);
                 //write the alert here
                 navigate('/books/add');
@@ -156,6 +164,7 @@ async function sendForm (event) {
                         <input
                         type="text"
                         name="title"
+                        required
                         placeholder='Insert...'
                         value={title} onChange={e => setTitle(e.target.value)} />
                     </label>
@@ -164,6 +173,7 @@ async function sendForm (event) {
                         <input
                         type="text"
                         name="editor"
+                        required
                         placeholder='Insert...'
                         value={editor} onChange={e => setEditor(e.target.value)} />
                     </label> 
@@ -172,10 +182,11 @@ async function sendForm (event) {
                         <br/>
                         <select 
                             name="country" 
+                            required
                             value={country} 
                             onChange={e => setCountry(e.target.value)}
                         >
-                            <option value="">Select a country</option>
+                            <option value="">Select a country</option> {/* Ajoutez cette ligne */}
                             {
                                 countriesList.map((country) => (
                                     <option key={country} value={country}>{country}</option>
@@ -189,6 +200,7 @@ async function sendForm (event) {
                         <input
                         type="text"
                         name="isbn"
+                        required
                         placeholder='Insert...'
                         value={isbn} onChange={e => setIsbn(e.target.value)} />
                     </label>
@@ -197,6 +209,7 @@ async function sendForm (event) {
                         <input
                         type="text"
                         name="author"
+                        required
                         placeholder='Insert...'
                         value={author} onChange={e => setAuthor(e.target.value)} />
                     </label>
@@ -205,6 +218,7 @@ async function sendForm (event) {
                         <input
                         type="text"
                         name="year"
+                        required
                         placeholder='Insert...'
                         value={year} onChange={e => setYear(e.target.value)} />
                     </label>
@@ -213,6 +227,7 @@ async function sendForm (event) {
                         <input
                         type="text"
                         name="pages"
+                        required
                         placeholder='Insert...'
                         value={pages} onChange={e => setPages(e.target.value)} />
                     </label>
@@ -221,6 +236,7 @@ async function sendForm (event) {
                         <input
                         type="text"
                         name="genre"
+                        required
                         placeholder='Insert...'
                         value={genre} onChange={e => setGenre(e.target.value)} />
                     </label>                    
@@ -229,6 +245,7 @@ async function sendForm (event) {
                         <textarea
                         id="summary"
                         name="summary"
+                        required
                         placeholder='Insert...'
                         value={summary} onChange={e => setSummary(e.target.value)} />
                     </label>
@@ -240,15 +257,14 @@ async function sendForm (event) {
                         placeholder='Insert...'
                         value={illustrator} onChange={e => setIllustrator(e.target.value)} />
                     </label>
-                    <label className="field">Image:
+                    <label>Image:</label>
                         <br/>
                         <input
-                        type="text"
-                        name="image"
-                        placeholder='Insert...'
-                        value={image} onChange={e => setImage(e.target.value)} />
-                    </label>
-                    <input type="submit" value="Submit" />
+                            type={"file"}
+                            accept={"image/*"}
+                            onChange={(e) =>setImage(e.target.files[0])}
+                        />
+                     <input type="submit" value="Submit" />
             </form>
                 
            

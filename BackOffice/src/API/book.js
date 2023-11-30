@@ -6,7 +6,7 @@ const sendForm = async (formData,token) => {
   try {
     const response = await axios.post(bookURL, formData, {
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data',
         'Authorization' : 'Bearer ' + token
       }
     });
@@ -34,7 +34,13 @@ const getAllBooks = async (token) => {
 
 const getBookById = async (id, token) => {
 
-  const response = await axios.get(`${bookURL}/${id}`);
+  const response = await axios.get(`${bookURL}/${id}`,
+  {
+    headers: {
+      'Authorization' : 'Bearer ' + token
+    }
+  }
+  );
   console.log("${userURL}/${id}", `${bookURL}/${id}`);
   console.log("response: ", response);
   return response.data;
@@ -58,7 +64,7 @@ const updateBook = async (formData,token) => {
 
     return await axios.patch(bookURL, formData, {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
           'Authorization': 'Bearer ' + token
         }
       })

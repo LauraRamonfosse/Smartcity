@@ -6,11 +6,15 @@ import { useEffect } from 'react';
 import { sendForm as APISendForm } from '../../API/comments';
 import { updateComment as APIUpdateComment } from '../../API/comments';
 import { getComment } from '../../API/comments';
+import { getReviewById } from '../../API/reviews';
+import { useSelector } from 'react-redux';
 
 function CommentForm(){
     const params = useParams();
     const[content, setContent] = useState('');
     const navigate = useNavigate();
+    const token = useSelector(state => state.token);
+    // const id = useSelector(state => state.token.value.id);
 
     useEffect(() => {
         if(params.type === 'modify'){
@@ -33,11 +37,16 @@ function CommentForm(){
         switch (params.type) {
             case 'add':
                 formData.append('content', content);
+                formData.append('review_id', params.id);
+                const review = await getReviewById(parseInt(params.id));
+                formData.append('user_id', review.user_id);
+                console.log("token CommentForm: ", token);
                 try {
+                    console.log('formData', formData);
                     await APISendForm(formData);
                     console.log('OK');
                     alert('The comment has been added to the database');
-                    navigate('/comments/add');
+                    navigate(0);
                 } catch (e) {
                     console.log(e);
                     alert('An error occured');

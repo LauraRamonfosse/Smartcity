@@ -12,16 +12,16 @@ function Menu() {
 
         switch(buttonName) {
           case 'USER':
-            navigate('/users');
+            navigate('/users/add');
             break;
           case 'BOOK':
-            navigate('/books');
+            navigate('/books/add');
             break;
           case 'REVIEW':
-            navigate('/reviews');
+            navigate('/reviews/add');
             break;
           case 'ROLE':
-            navigate('/roles');
+            navigate('/roles/add');
             break;
           case 'BEST':
             navigate('/best');
