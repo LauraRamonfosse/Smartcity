@@ -26,7 +26,7 @@ module.exports.getComment = async (req, res) => {
     }
 }
 
-module.exports.getAllCommentFromReviewId  = async (req, res) => {
+module.exports.getAllCommentsFromReviewId  = async (req, res) => {
     const client = await pool.connect();
     const idTexte = req.params.id; // attention ! Il s'agit de texte !
     const id = parseInt(idTexte);
@@ -35,7 +35,7 @@ module.exports.getAllCommentFromReviewId  = async (req, res) => {
         if (isNaN(id)) {
             res.sendStatus(400);
         } else {
-            const { rows: comments } = await commentModele.getAllCommentFromReviewId(client, id);
+            const { rows: comments } = await commentModele.getAllCommentsFromReviewId(client, id);
 
             if (comments.length > 0) {
                 // Si des commentaires sont trouvés, renvoyer tous les commentaires
@@ -56,12 +56,17 @@ module.exports.getAllCommentFromReviewId  = async (req, res) => {
 
 
 module.exports.postComment = async (req, res) => {
-    const body = req.body;
-    const {content, authorId, reviewId} = body;
+    // const body = req.body;
+    const {content, review_id, user_id} = req.body;
     const client = await pool.connect();
     try{
-        const {rows} = await commentModele.postComment(client, content, authorId, reviewId);
-        res.sendStatus(201).send(rows[0].id);
+        console.log("req.body", req.body);
+        const {rows} = await commentModele.postComment(client, content, user_id, review_id);
+        console.log("rows", rows);
+        const commentId = rows[0].id;
+        console.log("commentId", commentId);
+        const message = 'Le commentaire a été ajouté avec succès.';
+        res.status(201).json({message, commentId});
     } catch (error){
         console.error(error);
         res.sendStatus(500);

@@ -6,6 +6,7 @@ module.exports.getRoles = async (req,res) =>{
     try{
         const {rows : roles} = await roleModele.getRoles(client);
         for(let role of roles){
+            //creer un id personnalisé plutot car l'ID est une combinaison de clés primaires d'autres tables
             role.id = id;
             id++;
         }

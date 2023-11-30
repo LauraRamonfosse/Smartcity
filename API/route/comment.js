@@ -8,7 +8,7 @@ const multer = require("multer");
 const upload = multer();
 
 router.get('/:id', CommentController.getComment);
-router.get('/all/:id', CommentController.getAllCommentFromReviewId);
+router.get('/all/:id', CommentController.getAllCommentsFromReviewId);
 
 router.post('/', upload.fields([
     {name:"content", maxCount :1},

@@ -1,12 +1,17 @@
-const pool = require('../modele/database.js');
+const pool = require('../modele/database');
 const bookModele = require('../modele/bookDB');
 const roleModele = require('../modele/roleDB');
 const actorModele = require('../modele/actorDB');
 const reviewModele = require('../modele/reviewDB');
-const bookSchema = require('../schema/ValidationSchemas.js');
+const {bookSchema} = require('../schema/ValidationSchemas.js');
+const {saveImage} = require('../modele/imageManager');
+const imageSize = require('image-size');
+const uuid = require('uuid');
+const fs = require('fs');
+const destFolderImages = "./upload/images";
 
 module.exports.getBookByID = async (req, res) => {
-    if(req.session !== undefined){
+    if(req.session === undefined){
         const bookISBN = req.params.id;
         const client = await pool.connect();
         try {
@@ -49,7 +54,7 @@ module.exports.getBookByID = async (req, res) => {
         } 
         catch (error) {
             await client.query('ROLLBACK');
-            console.error(error);
+            console.error("error: ", error);
             res.sendStatus(500);
         } 
         finally {
@@ -101,12 +106,12 @@ module.exports.getBooks = async (req, res) => {
             } 
             else {
                 await client.query('ROLLBACK');
-                res.status(404).json({ error: 'Aucun livre existant' });
+                res.status(404).json('Aucun livre existant');
             }
         } 
         catch (error) {
             await client.query('ROLLBACK');
-            console.error(error);
+            console.error("error: ", error);
             res.sendStatus(500);
         } 
         finally {
@@ -119,11 +124,25 @@ module.exports.getBooks = async (req, res) => {
 }
 
 
+
 module.exports.createBook = async (req, res) => {
     const toInsert = req.body;
+    const image = req.files?.image || null;
+    let imageName = null;
+    // Image facultative donc vérifier si elle existe
+    if (image) {
+        console.log("OK IMAGE");
+        // Vérifier si les dimensions de l'image sont valides en utilisant image-size
+        const dimensions = imageSize(image[0].buffer);
+        if (!dimensions.width || !dimensions.height) {
+            return res.status(400).json("Le fichier n\'est pas une image valide.");
+        }
+        imageName = uuid.v4();
+    }
 
     try {
-        // Validate the request body against the Zod schema
+        console.log("OK Try");
+        // Valider les champs du formulaire
         const newData = bookSchema.parse({
             isbn: toInsert.isbn,
             title: toInsert.title,
@@ -133,21 +152,22 @@ module.exports.createBook = async (req, res) => {
             releasedYear: toInsert.released_year,
             pages: parseInt(toInsert.pages),
             publishingHouse: toInsert.publishing_house,
-            illustrator: toInsert.illustrator === undefined ? null : toInsert.illustrator,
-            imgPath: toInsert.img_path === undefined ? null : toInsert.img_path,
+            illustrator: toInsert.illustrator === "" ? null : toInsert.illustrator,
+            imgPath: imageName,
             author: toInsert.author,
         });
+        console.log("OK Vérification champs");
+        console.log("New data : ", newData);
 
-        // Perform additional data transformations if needed
+        //Transformer l'année en int pour l'insérer dans la BD
         newData.releasedYear = parseInt(newData.releasedYear);
 
-        // Create an array of actors
+        // Créer un tableau d'acteurs
         const actors = [{ type: "author", name: newData.author }, { type: "illustrator", name: newData.illustrator }];
         const client = await pool.connect();
-
         try {
             await client.query('BEGIN;');
-            // Insert the book into the DB
+            // Insérer le livre dans la base de données
             await bookModele.insertBook(
                 newData.isbn,
                 newData.title,
@@ -159,21 +179,29 @@ module.exports.createBook = async (req, res) => {
                 newData.publishingHouse,
                 newData.imgPath,
                 client
-            );            
+            );
 
-            // Process actors and roles
+            // Traiter les acteurs et les rôles
             for (let actor of actors) {
                 if (actor.name != null) {
-                    // Check if the actor exists in the DB
+                    // Vérifier si l'acteur existe dans la base de données
                     const { rows: actorRows } = await actorModele.getActor(actor.name, client);
-                    // Insert the actor into the DB if not exists
+                    // Insérer l'acteur dans la base de données s'il n'existe pas
                     let actorID = actorRows.length > 0 ? actorRows[0].id : await actorModele.insertActor(actor.name, client);
-                    // Insert the role into the DB
+                    // Insérer le rôle dans la base de données
                     await roleModele.insertRole(newData.isbn, actorID, actor.type, client);
                 }
             }
 
             await client.query("COMMIT");
+            // Utiliser la fonction saveImage pour enregistrer l'image seulement si tout a fonctionné et qu'une image est fournie
+            if (image) {
+                try {
+                    await saveImage(image[0].buffer, imageName, destFolderImages);
+                } catch (error) {
+                    res.sendStatus(500).json()
+                }
+            }
             res.sendStatus(201);
         } catch (error) {
             await client.query('ROLLBACK');
@@ -184,89 +212,138 @@ module.exports.createBook = async (req, res) => {
         }
 
     } catch (error) {
-        console.error(error.errors);
-        res.status(400).json({ error: "Form validation failed", details: error.errors });
+        res.sendStatus(400);
+        if (error.errors) {
+            // Zod validation error contains an array of individual errors
+            error.errors.forEach((validationError) => {
+              console.error(`Validation Error for ${validationError.path.join('.')} : ${validationError.message}`);
+            });
+        } else {
+            // Handle non-validation errors
+            console.error(`Error during validation: ${error.message}`);
+        }
+        
     }
 };
+
+
 
 
 
 module.exports.updateBook = async (req, res) => {
     const toUpdate = req.body;
     const bookISBN = toUpdate.isbn;
+    const image = req.files?.image || null;
+    let imageName = null;
+    if(bookISBN != undefined){
 
-    try {
-        // Validate the request body against the Zod schema
-        const updatedData = bookSchema.parse({
-            isbn: bookISBN,
-            title: toUpdate.title,
-            description: toUpdate.description,
-            country: toUpdate.country,
-            genre: toUpdate.genre,
-            released_year: toUpdate.released_year,
-            pages: parseInt(toUpdate.pages),
-            publishing_house: toUpdate.publishing_house,
-            illustrator: toUpdate.illustrator === undefined ? null : toUpdate.illustrator,
-            img_path: toUpdate.img_path === undefined ? null : toUpdate.img_path,
-            author: toUpdate.author,
-        });
-
-        // Perform additional data transformations if needed
-        updatedData.released_year = parseInt(updatedData.released_year);
-
-        // Create an array of actors
-        const actors = [{ type: "author", name: updatedData.author }, { type: "illustrator", name: updatedData.illustrator }];
-        const client = await pool.connect();
+        // Handle image if provided
+        if (image) {
+            // Validate image dimensions
+            const dimensions = imageSize(image[0].buffer);
+            if (!dimensions.width || !dimensions.height) {
+                return res.status(400).json("Le fichier n\'est pas une image valide.");
+            }
+            imageName = uuid.v4();
+        }
 
         try {
-            await client.query('BEGIN;');
-            // Update the book in the DB
-            await bookModele.updateBook(
-                bookISBN,
-                updatedData.title,
-                updatedData.description,
-                updatedData.country,
-                updatedData.genre,
-                updatedData.released_year,
-                updatedData.pages,
-                updatedData.publishing_house,
-                updatedData.img_path,
-                client
-            );
+            // Validate the request body against the Zod schema
+            const updatedData = bookSchema.parse({
+                isbn: bookISBN,
+                title: toUpdate.title,
+                description: toUpdate.description,
+                country: toUpdate.country,
+                genre: toUpdate.genre,
+                releasedYear: toUpdate.released_year,
+                pages: parseInt(toUpdate.pages),
+                publishingHouse: toUpdate.publishing_house,
+                illustrator: toUpdate.illustrator === "" ? null : toUpdate.illustrator,
+                imgPath: imageName,
+                author: toUpdate.author,
+            });
 
-            // Delete roles linked to the book in the DB
-            await roleModele.deleteRole(bookISBN, client);
+            updatedData.releasedYear = parseInt(updatedData.releasedYear);
 
-            // Reassign roles based on the new data
-            for (let actor of actors) {
-                if (actor.name != null) {
-                    // Check if the actor exists in the DB
-                    const { rows: actorRows } = await actorModele.getActor(actor.name, client);
+            // Create an array of actors
+            const actors = [{ type: "author", name: updatedData.author }, { type: "illustrator", name: updatedData.illustrator }];
+            const client = await pool.connect();
 
-                    // Insert the actor into the DB if not exists + get the ID
-                    const actorID = actorRows.length > 0 ? actorRows[0].id : await actorModele.insertActor(actor.name, client);
-
-                    // Insert the role into the DB
-                    await roleModele.insertRole(bookISBN, actorID, actor.type, client);
+            try {
+                //Supprimer l'image du folder upload
+                let fileNameToDelete = null;
+                let filePath = null;
+                const {rows} = await bookModele.getBookByID(bookISBN, client);
+                if(rows[0].img_path){
+                    fileNameToDelete = rows[0].img_path
+                    filePath = `${destFolderImages}/${fileNameToDelete}.jpeg`;
+                    // Vérifier si le fichier existe avant de le supprimer
+                    if (fs.existsSync(filePath)) {
+                        // Supprimer le fichier
+                        fs.unlinkSync(filePath);
+                        console.log(`Le fichier ${fileNameToDelete} a été supprimé.`);
+                    }
                 }
+                await client.query('BEGIN;');
+                // Update the book in the DB
+                await bookModele.updateBook(
+                    bookISBN,
+                    updatedData.title,
+                    updatedData.description,
+                    updatedData.country,
+                    updatedData.genre,
+                    updatedData.releasedYear,
+                    updatedData.pages,
+                    updatedData.publishingHouse,
+                    updatedData.imgPath,
+                    client
+                );
+                // Delete roles linked to the book in the DB
+                await roleModele.deleteRole(bookISBN, client);
+
+                // Reassign roles based on the new data
+                for (let actor of actors) {
+                    if (actor.name != null) {
+                        // Check if the actor exists in the DB
+                        const { rows: actorRows } = await actorModele.getActor(actor.name, client);
+
+                        // Insert the actor into the DB if not exists + get the ID
+                        const actorID = actorRows.length > 0 ? actorRows[0].id : await actorModele.insertActor(actor.name, client);
+
+                        // Insert the role into the DB
+                        await roleModele.insertRole(bookISBN, actorID, actor.type, client);
+                    }
+                }
+
+                await client.query("COMMIT");
+                // Save the new image only if the book update is successful and an image is provided
+                if (image) {
+                    try {
+                        await saveImage(image[0].buffer, imageName, destFolderImages);
+                    } catch (error) {
+                        console.error(error);
+                        res.status(500).json("Erreur lors de la mise à jour de l'image");
+                    }
+                }
+                res.sendStatus(204);
+
+            } catch (error) {
+                await client.query('ROLLBACK');
+                console.error(error);
+                res.status(500).json("Erreur lors de la mise à jour du livre");
+            } finally {
+                client.release();
             }
-
-            await client.query("COMMIT");
-            res.sendStatus(204);
-
         } catch (error) {
-            await client.query('ROLLBACK');
-            console.error(error);
-            res.status(500).json({ error: "Erreur lors de la mise à jour du livre", details: error.message });
-        } finally {
-            client.release();
+            // Handle validation errors
+            console.error(error.errors);
+            res.status(400).json("La validation du formulaire a échoué");
         }
-    } catch (error) {
-        // Handle validation errors
-        console.error(error.errors);
-        res.status(400).json({ error: "La validation du formulaire a échoué", details: error.errors });
+    } else{
+        res.sendStatus(400);
     }
 };
+
 
 
 
@@ -275,6 +352,20 @@ module.exports.deleteBook = async (req,res) =>{
     if(bookISBN != undefined){
         const client = await pool.connect();
         try{
+            //Supprimer l'image du folder upload
+            let fileNameToDelete = null;
+            let filePath = null;
+            const {rows} = await bookModele.getBookByID(bookISBN, client);
+            if(rows[0].img_path){
+                fileNameToDelete = rows[0].img_path
+                filePath = `${destFolderImages}/${fileNameToDelete}.jpeg`;
+                // Vérifier si le fichier existe avant de le supprimer
+                if (fs.existsSync(filePath)) {
+                    // Supprimer le fichier
+                    fs.unlinkSync(filePath);
+                    console.log(`Le fichier ${fileNameToDelete} a été supprimé.`);
+                }
+            }
             await client.query("BEGIN;");
             //Supprimer les roles liés au livre
             await roleModele.deleteRole(bookISBN,client);

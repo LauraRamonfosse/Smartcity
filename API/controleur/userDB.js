@@ -5,6 +5,13 @@ const hash = require('../utils/utils');
 
 const pool = require('../modele/database');
 const UserModele = require('../modele/userDB');
+const {userSchema} = require('../schema/ValidationSchemas');
+const saveImage = require('../modele/imageManager');
+const imageSize = require('image-size');
+const uuid = require('uuid');
+const fs = require('fs');
+const { profile } = require("console");
+const destFolderImages = "./upload/images";
 
 module.exports.login = async (req, res) => {
     
@@ -174,33 +181,54 @@ module.exports.getUser = async (req, res) => {
 module.exports.createUser = async (req, res) => {
     const client = await pool.connect();
     const newData = req.body;
+    const image = req.files?.image || null;
     const userObj = req.session;
-    if (!newData.username
-        || !newData.password
-        || !newData.email_address
-        || !newData.role
-        || !newData.country
-        || !newData.phone_number
-        || !newData.news_letter
-        ) {
-        res.sendStatus(400);
-        return;
+    let imageName = null;
+
+    if (image) {
+        console.log("OK IMAGE");
+        // Vérifier si les dimensions de l'image sont valides en utilisant image-size
+        const dimensions = imageSize(image[0].buffer);
+        if (!dimensions.width || !dimensions.height) {
+            return res.status(400).json("Le fichier n\'est pas une image valide.");
+        }
+        imageName = uuid.v4();
     }
+    
     if (userObj.role !== "admin") {
         newData.role = "user";
     }
     try{
+        const newUser = userSchema.parse({
+            username: newData.username,
+            password: newData.password,
+            email_address: newData.email_address,
+            role: newData.role,
+            country: newData.country,
+            phone_number: newData.phone_number,
+            news_letter: (newData.news_letter === "true"),
+            profile_picture_path: imageName
+        });
         await UserModele.createUser(
             client,
-            newData.username,
-            newData.password,
-            newData.email_address,
-            newData.role,
-            newData.country,
-            newData.phone_number,
-            newData.news_letter,
-            newData.profile_picture_path
+            newUser.username,
+            newUser.password,
+            newUser.email_address,
+            newUser.role,
+            newUser.country,
+            newUser.phone_number,
+            newUser.news_letter,
+            newUser.profile_picture_path
         );
+        if (image) {
+            try {
+                await saveImage(image[0].buffer, imageName, destFolderImages);
+            } catch (error) {
+                res.sendStatus(500).json()
+            }
+        }
+
+
         res.sendStatus(201);
     }
     catch (e) {

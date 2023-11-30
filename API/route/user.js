@@ -17,7 +17,8 @@ router.post('/', upload.fields([
     {name: 'role', maxCount: 1, default: 'user'},
     {name: 'country', maxCount: 1},
     {name: 'phone_number', maxCount: 1},
-    {name: 'news_letter', maxCount: 1}
+    {name: 'news_letter', maxCount: 1},
+    {name: 'profile_picture_path', maxCount: 1}
 ]), JWTMiddleWare.identification, UserControleur.createUser);
 
 router.post('/login',upload.fields([
