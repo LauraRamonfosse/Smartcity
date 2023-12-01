@@ -118,7 +118,6 @@ async function sendForm (event) {
                 // Affichez une alerte ou effectuez toute autre action en cas d'erreur
                 alert('Failed to add the book. Please check your input and try again.');
             }
-            navigate(0);
         }
         else if(params.type === 'modify'){
             // formData.append('avatar', avatar.current);

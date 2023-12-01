@@ -61,7 +61,7 @@ const updateUser = async (formData, token) => {
     //return a user
     return await axios.patch(userURL, formData, {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
           'Authorization': 'Bearer ' + token
         }
       })

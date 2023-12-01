@@ -4,18 +4,43 @@ import {Link} from 'react-router-dom'
 import DeleteButton from './DeleteButton'
 import ModifyButton from './ModifyButton'
 import { Popover, Button } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SearchBar from './searchBar';
 import { FaLink } from "react-icons/fa";
 import { FaCommentAlt } from "react-icons/fa";
 import { FaRegCircle } from "react-icons/fa";
 import { FaRegCheckCircle } from "react-icons/fa";
 import Pagination from './Pagination';
+import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux'
 
-function DataTable({ headers, dataRows }) {
+function DataTable() {
+  const params = useParams();
   const elementsPerPage = 7;
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  let headers = [];
+  const userDataRows = useSelector(state => state.users.users);
+  console.log("params.name: ", params.name);
+
+  const dataRows = userDataRows;
+
+switch (params.name) {
+  case 'users':
+    headers = ['ID', 'Username', 'Email', 'Role', 'Phone', 'Country', 'Newsletter', 'Delete', 'Modify'];
+    break;
+  case 'books':
+    headers = ['ID', 'Title', 'Author', 'Year', 'Genre', 'Country', 'Pages', 'Editor', 'ISBN', 'Summary', 'Illustrator', 'Delete', 'Modify'];
+    break;
+  case 'comments':
+    headers = ['ID', 'Comment', 'Book', 'User', 'Delete', 'Modify'];
+    break;
+  case 'reviews':
+    headers = ['ID', 'Review', 'Book', 'User', 'Delete', 'Modify'];
+    break;
+  default:
+    break;
+}
 
   const handleSearch = (term) => {
     setSearchTerm(term ? term : "");

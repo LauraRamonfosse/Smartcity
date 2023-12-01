@@ -65,7 +65,7 @@ async function sendForm (event) {
     formData.append('country', country);
     formData.append('phone_number', phone);
     formData.append('news_letter', newsletter);
-    formData.append('profile_picture_path', avatar.current);
+    formData.append('image', avatar.current);
     if(params.type === 'add'){
             // formData.append('avatar', avatar.current);
             try {

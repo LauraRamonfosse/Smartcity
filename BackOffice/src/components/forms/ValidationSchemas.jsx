@@ -46,13 +46,13 @@ const userSchema = z.object({
   role: z.string().refine((role) => role.trim() !== '', {
     message: 'Role is required',
   }),
+  country: z.string().refine((country) => country.trim() !== '', {
+    message: 'Country is required',
+  }),
   // the following field is a phone number, can only be numbers but can have a + at the beginning, have - / and . and is optional
   phone_number: z.string().refine((phone_number) => /^(\+)?(\d|\-|\.)*$/.test(phone_number), {
     message: 'Invalid phone number',
   }).optional(),
-  country: z.string().refine((country) => country.trim() !== '', {
-    message: 'Country is required',
-  }),
   news_letter: z.boolean()
 });
 
