@@ -77,7 +77,15 @@ module.exports.updateUser = async (req, res) => {
         if(userObj.authLevel !== "admin"){
             toUpdate.role = user.role;
         }
-        
+
+        if (image) {
+            // Validate image dimensions
+            const dimensions = imageSize(image[0].buffer);
+            if (!dimensions.width || !dimensions.height) {
+                return res.status(400).json("Le fichier n\'est pas une image valide.");
+            }
+            imageName = uuid.v4();
+        }
 
         if(
             toUpdate.username !== undefined ||
@@ -99,9 +107,21 @@ module.exports.updateUser = async (req, res) => {
             newData.country = toUpdate.country;
             newData.phone_number = toUpdate.phone_number;
             newData.news_letter = toUpdate.news_letter;
+            newData.profile_picture_path = imageName;
         }
 
         try{
+            const newUser = userSchema.parse({
+                username: newData.username,
+                password: newData.password,
+                email_address: newData.email_address,
+                role: newData.role,
+                country: newData.country,
+                phone_number: newData.phone_number,
+                news_letter: (newData.news_letter === "true"),
+                profile_picture_path: imageName
+            });
+
             await UserModele.updateUser(
                 client,
                 newData.id,
@@ -111,8 +131,30 @@ module.exports.updateUser = async (req, res) => {
                 newData.role,
                 newData.country,
                 newData.phone_number,
-                newData.news_letter
+                newData.news_letter,
+                newData.profile_picture_path
             );
+            let fileNameToDelete = null;
+            let filePath = null;
+            const {rows} = await bookModele.getBookByID(bookISBN, client);
+            if(rows[0].img_path){
+                fileNameToDelete = rows[0].img_path
+                filePath = `${destFolderImages}/${fileNameToDelete}.jpeg`;
+                // Vérifier si le fichier existe avant de le supprimer
+                if (fs.existsSync(filePath)) {
+                    // Supprimer le fichier
+                    fs.unlinkSync(filePath);
+                    console.log(`Le fichier ${fileNameToDelete} a été supprimé.`);
+                }
+            }
+            if (image) {
+                try {
+                    await saveImage(image[0].buffer, imageName, destFolderImages);
+                } catch (error) {
+                    console.error(error);
+                    res.status(500).json("Erreur lors de la mise à jour de l'image");
+                }
+            }
             res.sendStatus(204);
         }
         catch (e) {
@@ -182,6 +224,7 @@ module.exports.createUser = async (req, res) => {
     const client = await pool.connect();
     const newData = req.body;
     const image = req.files?.image || null;
+    console.log("image: ", image);
     const userObj = req.session;
     let imageName = null;
 
@@ -193,12 +236,14 @@ module.exports.createUser = async (req, res) => {
             return res.status(400).json("Le fichier n\'est pas une image valide.");
         }
         imageName = uuid.v4();
+        console.log("imageName: ", imageName);
     }
     
     if (userObj.role !== "admin") {
         newData.role = "user";
     }
     try{
+        console.log("newData: ", newData);
         const newUser = userSchema.parse({
             username: newData.username,
             password: newData.password,
@@ -207,8 +252,9 @@ module.exports.createUser = async (req, res) => {
             country: newData.country,
             phone_number: newData.phone_number,
             news_letter: (newData.news_letter === "true"),
-            profile_picture_path: imageName
-        });
+            image: imageName
+            });
+            console.log("newUser: ", newUser);
         await UserModele.createUser(
             client,
             newUser.username,
@@ -218,11 +264,13 @@ module.exports.createUser = async (req, res) => {
             newUser.country,
             newUser.phone_number,
             newUser.news_letter,
-            newUser.profile_picture_path
+            newUser.image
         );
+        console.log("newUser.image: ", newUser.image);
         if (image) {
             try {
                 await saveImage(image[0].buffer, imageName, destFolderImages);
+                console.log("image saved");
             } catch (error) {
                 res.sendStatus(500).json()
             }

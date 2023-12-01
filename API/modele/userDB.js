@@ -5,10 +5,10 @@ module.exports.getUserById = async (client, id) => {
     return await client.query("SELECT * FROM account WHERE id = $1", [id]);
   };
 
-module.exports.createUser = async (client, username, password, email_address, role, country, phone_number, news_letter, profile_picture_path) => {
+module.exports.createUser = async (client, username, password, email_address, role, country, phone_number, news_letter, image) => {
     return await client.query(
         `INSERT INTO account (username, password, email_address, role, country, phone_number, news_letter, profile_picture_path) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-        [username, await getHash(password), email_address, role, country, phone_number, news_letter, profile_picture_path]
+        [username, await getHash(password), email_address, role, country, phone_number, news_letter, image]
     );
 }
 

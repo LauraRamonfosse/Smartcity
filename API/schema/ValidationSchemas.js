@@ -53,7 +53,8 @@ const userSchema = z.object({
   country: z.string().refine((country) => country.trim() !== '', {
     message: 'Country is required',
   }),
-  news_letter: z.boolean()
+  news_letter: z.boolean(),
+  image: z.string().nullable().optional()
 });
 
 

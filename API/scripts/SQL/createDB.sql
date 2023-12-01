@@ -97,20 +97,20 @@ INSERT INTO review (date, rating, title, content, likes_counter, dislikes_counte
 ('2021-04-01 12:00:00', 5, 'Super livre', 'J''ai adoré ce livre, je le recommande à tout le monde !', 420, 20, 1, '978-2-1234-5680-3'),
 ('2021-04-01 12:00:00', 4, 'Très bon livre', 'J''ai bien aimé ce livre, je le recommande à tout le monde !', 52, 368, 1, '978-2-1234-5681-0'),
 ('2021-04-01 12:00:00', 3, 'Bon livre', 'J''ai bien aimé ce livre, je le recommande à tout le monde !', 678, 387, 1, '978-0-4515-2493-5'),
-('2021-04-01 12:00:00', 2, 'Mauvais livre', 'J''ai pas aimé ce livre, je le recommande à tout le monde !', 387, 38, 1, '978-2-1234-5682-7'),
-('2021-04-01 12:00:00', 1, 'Très mauvais livre', 'J''ai détesté ce livre, je le recommande à tout le monde !', 45, 5, 1, '978-2-1234-5683-4'),
-('2021-04-01 12:00:00', 5, 'Super livre', 'J''ai adoré ce livre, je le recommande à tout le monde !', 54, 453, 1, '978-2-1234-5684-1'),
+('2021-04-01 12:00:00', 2, 'Mauvais livre', 'J''ai pas aimé ce livre, je le recommande à tout le monde !', 387, 38, 2, '978-2-1234-5682-7'),
+('2021-04-01 12:00:00', 1, 'Très mauvais livre', 'J''ai détesté ce livre, je le recommande à tout le monde !', 45, 5, 4, '978-2-1234-5683-4'),
+('2021-04-01 12:00:00', 5, 'Super livre', 'J''ai adoré ce livre, je le recommande à tout le monde !', 54, 453, 2, '978-2-1234-5684-1'),
 ('2021-04-01 12:00:00', 4, 'Très bon livre', 'J''ai bien aimé ce livre, je le recommande à tout le monde !', 5, 2, 1, '978-2-1234-5680-3'),
-('2021-04-01 12:00:00', 3, 'Bon livre', 'J''ai bien aimé ce livre, je le recommande à tout le monde !', 354, 387, 1, '978-2-1234-5681-0'),
+('2021-04-01 12:00:00', 3, 'Bon livre', 'J''ai bien aimé ce livre, je le recommande à tout le monde !', 354, 387, 4, '978-2-1234-5681-0'),
 ('2021-04-01 12:00:00', 2, 'Mauvais livre', 'J''ai pas aimé ce livre, je le recommande à tout le monde !', 7880, 321, 1, '978-0-4515-2493-5'),
-('2021-04-01 12:00:00', 1, 'Très mauvais livre', 'J''ai détesté ce livre, je le recommande à tout le monde !', 783, 354, 1, '978-2-1234-5682-7'),
-('2021-04-01 12:00:00', 5, 'Super livre', 'J''ai adoré ce livre, je le recommande à tout le monde !', 354, 354, 1, '978-2-1234-5683-4'),
+('2021-04-01 12:00:00', 1, 'Très mauvais livre', 'J''ai détesté ce livre, je le recommande à tout le monde !', 783, 354, 2, '978-2-1234-5682-7'),
+('2021-04-01 12:00:00', 5, 'Super livre', 'J''ai adoré ce livre, je le recommande à tout le monde !', 354, 354, 2, '978-2-1234-5683-4'),
 -- commentaire philosophique sur le livre 1984
 ('2021-04-01 12:00:00', 5, 'Littéralement 1984', 'Ca en dit long sur la société... On vit dans une société', 354, 354, 1, '978-2-1234-5684-1'),
 ('2021-04-01 12:00:00', 3, 'Bon livre', 'J''ai bien aimé ce livre, je le recommande à tout le monde !', 354, 354, 1, '978-2-1234-5680-3'),
-('2021-04-01 12:00:00', 2, 'Mauvais livre', 'J''ai pas aimé ce livre, je le recommande à tout le monde !', 354, 354, 1, '978-2-1234-5681-0'),
-('2021-04-01 12:00:00', 1, 'Très mauvais livre', 'J''ai détesté ce livre, je le recommande à tout le monde !', 354, 354, 1, '978-0-4515-2493-5'),
-('2021-04-01 12:00:00', 5, 'Super livre', 'J''ai adoré ce livre, je le recommande à tout le monde !', 354, 354, 1, '978-2-1234-5682-7');
+('2021-04-01 12:00:00', 2, 'Mauvais livre', 'J''ai pas aimé ce livre, je le recommande à tout le monde !', 354, 354, 2, '978-2-1234-5681-0'),
+('2021-04-01 12:00:00', 1, 'Très mauvais livre', 'J''ai détesté ce livre, je le recommande à tout le monde !', 354, 354, 4, '978-0-4515-2493-5'),
+('2021-04-01 12:00:00', 5, 'Super livre', 'J''ai adoré ce livre, je le recommande à tout le monde !', 354, 354, 2, '978-2-1234-5682-7');
 
 DROP TABLE IF EXISTS comment CASCADE;
 
@@ -126,21 +126,21 @@ CREATE TABLE comment(
 
 INSERT INTO comment (content, date, likes_counter, dislikes_counter, review_id, user_id) VALUES 
 ('Tu as vraiment raison ! Mais je trouve que le livre est un peu trop long', '2021-04-01 12:00:00', 69, 420, 1, 2),
-('Je ne suis pas d accord avec toi, je trouve que le livre est très bien', '2021-04-01 12:00:00', 420, 69, 1, 2),
+('Je ne suis pas d accord avec toi, je trouve que le livre est très bien', '2021-04-01 12:00:00', 420, 69, 1, 1),
 ('c''est ouf, je trouve que le livre est très bien', '2021-04-01 12:00:00', 540, 387, 1, 2),
 ('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 738, 12, 2, 2),
-('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 231, 8376, 3, 2),
+('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 231, 8376, 3, 1),
 ('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 354, 21, 4, 2),
 ('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 345, 21, 5, 2),
 ('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 0, 0, 6, 2),
-('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 354, 354, 7, 2),
-('Je suis claqué au sol en progra, et react pu la merde, oui je suis un rageu', '2021-04-01 12:00:00', 50, 6, 1, 2),
+('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 354, 354, 7, 1),
+('Je suis claqué au sol en progra, et react pu la merde, oui je suis un rageu', '2021-04-01 12:00:00', 50, 6, 1, 1),
 ('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 35, 1, 8, 2),
 ('Ils sont vraiment trop longs ces livres', '2021-04-01 12:00:00', 438, 384, 9, 2),
 ('Cette lecture est une merveille de la littérature', '2021-04-01 12:00:00', 34, 384, 10, 2),
 ('L''histoire est vraiment trop longue', '2021-04-01 12:00:00', 34, 384, 11, 2),
-('on vit vraiment dans une société!! on devient adulte quand on se rend compte qu''on prefere le joker a batman! Et que le joker est un symbole de la lutte des classes! Pauvre bruce wayne, il est tellement riche qu''il ne peut pas comprendre la souffrance des pauvres! Prolétaire de tous les pays, unissez vous!#vivelanarchie #vivelarevolution', '2021-04-01 12:00:00', 1936, 19, 12, 2),
+('on vit vraiment dans une société!! on devient adulte quand on se rend compte qu''on prefere le joker a batman! Et que le joker est un symbole de la lutte des classes! Pauvre bruce wayne, il est tellement riche qu''il ne peut pas comprendre la souffrance des pauvres! Prolétaire de tous les pays, unissez vous!#vivelanarchie #vivelarevolution', '2021-04-01 12:00:00', 1936, 19, 12, 3),
 ('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 34, 384, 13, 2),
-('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 34, 384, 14, 2),
+('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 34, 384, 14, 1),
 ('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 34, 384, 15, 2),
-('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 34, 384, 16, 2);
+('Je suis d accord avec toi, le livre est vraiment trop long', '2021-04-01 12:00:00', 34, 384, 16, 4);
