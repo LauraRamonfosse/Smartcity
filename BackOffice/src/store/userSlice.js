@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { getAllUsers  } from '../API/user.js';
 
-// create a slice for users
-// Async thunk to fetch all users
-export const fetchUserData = async (token) => {
+
+export const fetchUserData = (token) => async (dispatch) => {
+    
     try {
         const userDataRows = [];
         const users = await getAllUsers(token);
@@ -20,10 +20,10 @@ export const fetchUserData = async (token) => {
                 {type: 'deleteButton', content: 'Delete'}
             ]);
         });
-        console.log("userDataRows from user slice", userDataRows);
-        return userDataRows;
+
+        dispatch(setUsers(userDataRows));
     } catch (error) {
-        console.error("Error fetching data: ", error);
+        dispatch(setUsersError(error.message));
     }
 };
 
@@ -31,7 +31,7 @@ export const fetchUserData = async (token) => {
 const usersSlice = createSlice({
     name: 'users',
     initialState: {
-        usersDataRows: [],
+        users: [],
         status: null,
         error: null
     },
@@ -39,6 +39,7 @@ const usersSlice = createSlice({
         // Add reducers for additional action types here, and handle loading state as needed
         setUsers: (state, action) => {
             state.users = action.payload;
+            state.status = 'succeeded';
         },
         clearUsers: (state) => {
             state.users = [];
