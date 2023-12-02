@@ -26,21 +26,7 @@ function Acceuil() {
     const [tableKey, setTableKey] = useState(0);
     const dispatch = useDispatch();
     const token = useSelector(state => state.auth.token);
-    const [users, setUsers] = useState([]);
-    const fetchDataInComponent = async () => {
-        try {
-                setUsers(await fetchUserData(token));
-            // Faites quelque chose avec les données des utilisateurs ici
-        } catch (error) {
-            console.error("Error fetching user data: ", error);
-        }
-    };
-
-    console.log("Users fetch data : ", users);
-  
-
-    
-    
+        
     
 
 
@@ -261,22 +247,17 @@ function Acceuil() {
     //     }
     // };
 
-
     useEffect(() => {
         switch(name){
             case 'users':
                 console.log("fetching user data");
-                <>
-                    <DataTable/>
-                    <FormButton type={type} name={name} form={<UserForm type={type}/>}/>
-                </>
+                dispatch(fetchUserData(token));
+        
+            
                 break;
             case 'books':
                 console.log("fetching book data");
-                <>
-                    <DataTable/>
-                    <FormButton type={type} name={name} form={<BookForm type={type}/>}/>
-                </>
+                dispatch(fetchBookData(token));
                 break;
             // case 'actors' :
             //     console.log("fetching actor data");
@@ -302,12 +283,17 @@ function Acceuil() {
                 setContent(<></>);
                 break;
         }
-    }, [name, type]);
+    }, [name, type, dispatch, token]);
 
-
+    const localBook = useSelector((state) => state.books.books);
     return (
-        <BackOfficeLayout content={content}/>
-    );
+
+        <>
+            <BackOfficeLayout content={ <><DataTable dataRows={localBook} /> <FormButton type={type} name={name} form={<BookForm type={type}/>}/> </>}>      
+            </BackOfficeLayout>
+
+        </>
+      );
     
 }
 
