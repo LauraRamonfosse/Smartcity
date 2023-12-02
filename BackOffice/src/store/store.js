@@ -7,21 +7,20 @@ import storage from 'redux-persist/lib/storage';
 import { persistStore, persistReducer } from 'redux-persist';
 import thunk from 'redux-thunk';
 
-const persistConfig = {
+// Configuration de la persistance pour le reducer auth
+const authPersistConfig = {
   key: 'root',
   storage
 };
 
 const rootReducer = combineReducers({
-  auth: authReducer,
+  auth: persistReducer(authPersistConfig, authReducer),
   books: bookSlice,
   users: userSlice
 });
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducer,
   middleware: [thunk]
 });
 
