@@ -2,9 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { getAllBooks  } from '../API/book.js';
 
 
-// create a slice for books
-// Async thunk to fetch all books
-export const fetchBookData = async(token) =>{
+export const fetchBookData = (token) => async (dispatch) => {
     
     try {
         const bookDataRows = [];
@@ -27,11 +25,11 @@ export const fetchBookData = async(token) =>{
                 {type: 'deleteButton', content: 'Delete'}
             ]);
 
-            dispatch(setBooks(bookDataRows));
         });
+        dispatch(setBooks(bookDataRows));
         
     } catch (error) {
-        console.error("Error fetching data: ", error);
+        console.log(error);
     }
 };
   
@@ -47,11 +45,12 @@ const booksSlice = createSlice({
         // Add reducers for additional action types here, and handle loading state as needed
         setBooks: (state, action) => {
             state.books = action.payload;
+            state.status = 'succeeded';
         },
         clearBooks: (state) => {
             state.books = [];
         },
-        setBook: (state, action) => {
+        addBook: (state, action) => {
             state.books.push(action.payload);
         },
         updateBook: (state, action) => {
@@ -79,7 +78,7 @@ const booksSlice = createSlice({
 });
 
 // Export actions
-export const { setBooks, clearBooks, setBook, updateBook, deleteBook, setBookStatus, setBookError } = booksSlice.actions;
+export const { setBooks, clearBooks, addBook, updateBook, deleteBook, setBookStatus, setBookError } = booksSlice.actions;
 
 // Export reducer
 export default booksSlice.reducer;
