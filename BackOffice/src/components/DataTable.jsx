@@ -14,23 +14,21 @@ import Pagination from './Pagination';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux'
 
-function DataTable() {
+function DataTable({dataRows}) {
   const params = useParams();
   const elementsPerPage = 7;
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   let headers = [];
-  const userDataRows = useSelector(state => state.users.users);
   console.log("params.name: ", params.name);
 
-  const dataRows = userDataRows;
 
 switch (params.name) {
   case 'users':
     headers = ['ID', 'Username', 'Email', 'Role', 'Phone', 'Country', 'Newsletter', 'Delete', 'Modify'];
     break;
   case 'books':
-    headers = ['ID', 'Title', 'Author', 'Year', 'Genre', 'Country', 'Pages', 'Editor', 'ISBN', 'Summary', 'Illustrator', 'Delete', 'Modify'];
+    headers = ['ISBN', 'TITLE','RATING', 'AUTHOR','ILLUSTRATOR', 'DESCRIPTION', 'COUNTRY', 'GENRE', 'YEAR', 'PAGES', 'EDITOR','IMG', 'MODIFY', 'DELETE'];
     break;
   case 'comments':
     headers = ['ID', 'Comment', 'Book', 'User', 'Delete', 'Modify'];
@@ -47,6 +45,8 @@ switch (params.name) {
     setPage(1);
   };
 
+  console.log("tableau dataRows: ", dataRows);
+  
   const filteredRows = dataRows.filter((row) => {
     return row.some((cell) => {
       return cell.content.toString().toLowerCase().includes(searchTerm.toLowerCase());
