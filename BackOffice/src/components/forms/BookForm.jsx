@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import Popup from 'reactjs-popup';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { bookSchema } from './ValidationSchemas';
+import {  addBook } from "../../store/bookSlice";
 import { sendForm as APISendForm, updateBook as APIUpdateBook, getBookById } from '../../API/book'
 import countriesList from '../Countries';
 
@@ -24,7 +25,8 @@ function BookForm(){
     const[illustrator, setIllustrator] = useState('');
     const[image, setImage] = useState('');
     const navigate = useNavigate();
-    const token = useSelector(state => state.token);
+    const token = useSelector(state => state.auth.token);
+    const dispatch = useDispatch();
 
 
     useEffect(() => {
@@ -109,8 +111,27 @@ async function sendForm (event) {
             console.log("send form 4");
             try {
                 console.log("send form 5");
+                const data = [
+                    {type: 'text', content: formData.isbn},
+                    {type: 'text', content: formData.title},
+                    {type: 'text', content: formData.rating},
+                    {type: 'text', content: formData.author},
+                    {type: 'text', content: formData.illustrator? book.illustrator : "none"},
+                    {type: 'text', content: formData.description},
+                    {type: 'text', content: formData.country},
+                    {type: 'text', content: formData.genre},
+                    {type: 'text', content: formData.released_year},
+                    {type: 'text', content: formData.pages},
+                    {type: 'text', content: formData.publishing_house},
+                    {type: 'text', content: formData.img_path},
+                    {type: 'modifyButton', content: 'Modify'},
+                    {type: 'deleteButton', content: 'Delete'}
+                ];
                 await APISendForm(formData, token);
                 alert('The book has been added to the database')
+
+                //fait un dispatch pour mettre à jour le state
+                dispatch(addBook(data));
             } catch (error) {
                 // Si une erreur se produit, vous pouvez traiter l'erreur ici
                 console.error("Error adding book:", error);
