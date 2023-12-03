@@ -4,11 +4,14 @@ import '../../stylesheet/backoffice.css';
 import { useState } from 'react';
 import { login } from '../../API/user';
 import { useDispatch } from 'react-redux';
-import { setToken } from '../../store/authSlice';
+import { setToken } from '../../store/slice/authSlice';
+import { useSelector } from 'react-redux';
+import { loadDataBase } from '../../store/dataBaseLoader';
 
 
 function Login() {
     const dispatch = useDispatch();
+    const token = useSelector(state => state.auth.token);
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -22,6 +25,8 @@ function Login() {
             if(token !== undefined){
                 console.log("token Login: ", token);
                 dispatch(setToken(token));
+                await loadDataBase(dispatch, token);
+                console.log("done");
                 navigate('/Acceuil');
             } else {
                 alert('Wrong username or password');

@@ -13,7 +13,7 @@ function CommentForm(){
     const params = useParams();
     const[content, setContent] = useState('');
     const navigate = useNavigate();
-    const token = useSelector(state => state.token);
+    const token = useSelector(state => state.auth.token);
     // const id = useSelector(state => state.token.value.id);
 
     useEffect(() => {

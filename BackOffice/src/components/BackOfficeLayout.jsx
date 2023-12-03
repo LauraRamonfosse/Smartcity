@@ -2,6 +2,7 @@ import React from 'react';
 import { Breadcrumb, Layout, theme } from 'antd';
 import Menu from './Menu';
 import '../stylesheet/backoffice.css';
+import DataTable from './DataTable';
 
 const { Header, Content, Footer } = Layout;
 const BackOfficeLayout = ({content}) => {
@@ -43,9 +44,10 @@ const BackOfficeLayout = ({content}) => {
             background: colorBgContainer,
           }}
         >
+        <DataTable/>
           {content}
         </div>
-      </Content>
+        </Content>
       <Footer
         style={{
           textAlign: 'center',

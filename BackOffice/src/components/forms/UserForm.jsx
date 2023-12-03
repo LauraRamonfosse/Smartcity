@@ -1,11 +1,13 @@
 import '../../stylesheet/backoffice.css';
 import {sendForm as APISendForm } from '../../API/user';
-import { updateUser, getUserById } from '../../API/user';
+import { updateUser as APIUpdateUser, getUserById } from '../../API/user';
 import {useParams, useNavigate} from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import countriesList from '../Countries';
 import { userSchema } from './ValidationSchemas';
+import { setUser, updateUser } from '../../store/slice/userSlice';
+import { useDispatch } from 'react-redux';
 
 
 
@@ -22,7 +24,8 @@ function UserForm(){
     const avatar = useRef(null);
 
     const navigate = useNavigate();
-    const token = useSelector(state => state.token);
+    const dispatch = useDispatch();
+    const token = useSelector(state => state.auth.token);
 
     useEffect(() => {
         if(params.type === 'modify'){
@@ -66,6 +69,19 @@ async function sendForm (event) {
     formData.append('phone_number', phone);
     formData.append('news_letter', newsletter);
     formData.append('image', avatar.current);
+
+    const userData = [
+        {type: 'text', content: params.id},
+        {type: 'text', content: username},
+        {type: 'text', content: email},
+        {type: 'text', content: password},
+        {type: 'text', content: role},
+        {type: 'text', content: country},
+        {type: 'text', content: phone},
+        {type: 'boolean', content: newsletter},
+        {type: 'modifyButton', content: 'Modify'},
+        {type: 'deleteButton', content: 'Delete'}
+    ]
     if(params.type === 'add'){
             // formData.append('avatar', avatar.current);
             try {
@@ -81,7 +97,7 @@ async function sendForm (event) {
                 await APISendForm(formData, token);
                 //write the alert here
                 alert('The user has been added to the database');
-                navigate(0);
+                dispatch(setUser(userData));
             } catch (e) {
                 console.log(e);
             }
@@ -89,10 +105,10 @@ async function sendForm (event) {
 
             // formData.append('avatar', avatar.current);
             try {
-                await updateUser(formData, token);
+                await APIUpdateUser(formData, token);
                 //write the alert here
                 alert('The user has been modified in the database');
-                navigate('/users/add');
+                dispatch(updateUser(userData));
             } catch (e) {
                 console.log(e);
             }

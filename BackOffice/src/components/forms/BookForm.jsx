@@ -8,6 +8,8 @@ import { useSelector } from "react-redux";
 import { bookSchema } from './ValidationSchemas';
 import { sendForm as APISendForm, updateBook as APIUpdateBook, getBookById } from '../../API/book'
 import countriesList from '../Countries';
+import { setBook, updateBook } from '../../store/slice/bookSlice';
+import { useDispatch } from 'react-redux';
 
 function BookForm(){
     const params = useParams();
@@ -18,13 +20,13 @@ function BookForm(){
     const[country, setCountry] = useState('');
     const[pages, setPages] =useState('');
     const[editor, setEditor] = useState('');
-    const[rating,setRating] = useState('');
     const[isbn, setIsbn] = useState('');
     const[summary, setSummary] = useState('');
     const[illustrator, setIllustrator] = useState('');
     const[image, setImage] = useState('');
     const navigate = useNavigate();
-    const token = useSelector(state => state.token);
+    const token = useSelector(state => state.auth.token);
+    const dispatch = useDispatch();
 
 
     useEffect(() => {
@@ -44,7 +46,6 @@ function BookForm(){
                     setSummary(response.description);
                     setIllustrator(response.illustrator);
                     setImage(response.img_path);
-                    setRating(response.rating);
                 })
                 .catch((error) => {
                     console.log("error: ", error);
@@ -63,7 +64,6 @@ function BookForm(){
                 setSummary('');
                 setIllustrator('');
                 setImage('');
-                setRating('');
             }
     }, [params.type]);
 
@@ -103,6 +103,19 @@ async function sendForm (event) {
     console.log("formData: ", formData);
     console.log("send form 3");
     console.log("params.type: ", params.type);
+    const bookData = [
+        {type: 'text', content:isbn},
+        {type: 'text', content: title},
+        {type: 'text', content: summary},
+        {type: 'text', content: country},
+        {type: 'text', content: genre},
+        {type: 'text', content: year},
+        {type: 'text', content: pages},
+        {type: 'text', content: editor},
+        {type: 'text', content: image},
+        {type: 'modifyButton', content: 'Modify'},
+        {type: 'deleteButton', content: 'Delete'}
+    ]
 
         if(params.type === 'add'){
 
@@ -110,7 +123,8 @@ async function sendForm (event) {
             try {
                 console.log("send form 5");
                 await APISendForm(formData, token);
-                alert('The book has been added to the database')
+                alert('The book has been added to the database');
+                dispatch(setBook(bookData));
             } catch (error) {
                 // Si une erreur se produit, vous pouvez traiter l'erreur ici
                 console.error("Error adding book:", error);
@@ -125,8 +139,8 @@ async function sendForm (event) {
                 console.log("token update", token);
                 await APIUpdateBook(formData,token);
                 //write the alert here
-                navigate('/books/add');
                 alert('The book has been modified in the database');
+                dispatch(updateBook(bookData));
             } catch (e) {
                 console.log(e);
             }

@@ -13,6 +13,7 @@ import { FaRegCheckCircle } from "react-icons/fa";
 import Pagination from './Pagination';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux'
+import { set } from 'zod';
 
 function DataTable() {
   const params = useParams();
@@ -20,38 +21,62 @@ function DataTable() {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   let headers = [];
-  const userDataRows = useSelector(state => state.users.users);
   console.log("params.name: ", params.name);
+  const [dataRows, setDataRows] = useState([]);
+  const users = useSelector(state => state.users.users);
+  const books = useSelector(state => state.books.books);
+  const reviews = useSelector(state => state.reviews.reviews);
+  const roles = useSelector(state => state.roles.roles);
+  const actors = useSelector(state => state.actors.actors);
 
-  const dataRows = userDataRows;
+useEffect(() => {
+  switch (params.name) {
+    case 'users':
+      headers = ['ID', 'Username', 'Email', 'Role', 'Phone', 'Country', 'Newsletter', 'Delete', 'Modify'];
+      setDataRows(users);
+      break;
+    case 'books':
+      headers = ['ID', 'Title', 'Author', 'Year', 'Genre', 'Country', 'Pages', 'Editor', 'ISBN', 'Summary', 'Illustrator', 'Delete', 'Modify'];
+      setDataRows(books);
+      break;
+    case 'comments':
+      headers = ['ID', 'Comment', 'Book', 'User', 'Delete', 'Modify'];
+      break;
+    case 'reviews':
+      headers = ['ID', 'Review', 'Book', 'User', 'Delete', 'Modify'];
+      setDataRows(reviews);
+      break;
+    case 'roles':
+      headers = ['ID', 'Role', 'Delete', 'Modify'];
+      setDataRows(roles);
+      break;
+    case 'actors':
+      headers = ['ID', 'Actor', 'Delete', 'Modify'];
+      setDataRows(actors);
+      break;
+    default:
+      console.log("default");
+      setDataRows([]);
+      break;
+  }
+  setPage(1);
+}, [params.name, users, books, reviews, roles, actors]);
 
-switch (params.name) {
-  case 'users':
-    headers = ['ID', 'Username', 'Email', 'Role', 'Phone', 'Country', 'Newsletter', 'Delete', 'Modify'];
-    break;
-  case 'books':
-    headers = ['ID', 'Title', 'Author', 'Year', 'Genre', 'Country', 'Pages', 'Editor', 'ISBN', 'Summary', 'Illustrator', 'Delete', 'Modify'];
-    break;
-  case 'comments':
-    headers = ['ID', 'Comment', 'Book', 'User', 'Delete', 'Modify'];
-    break;
-  case 'reviews':
-    headers = ['ID', 'Review', 'Book', 'User', 'Delete', 'Modify'];
-    break;
-  default:
-    break;
-}
+console.log("dataRows: ", dataRows);
 
   const handleSearch = (term) => {
     setSearchTerm(term ? term : "");
     setPage(1);
   };
 
+
   const filteredRows = dataRows.filter((row) => {
     return row.some((cell) => {
       return cell.content.toString().toLowerCase().includes(searchTerm.toLowerCase());
     });
   });
+
+  console.log("filteredRows: ", filteredRows);
 
   const totalPages = Math.ceil(filteredRows.length / elementsPerPage);
   const startIndex = (page - 1) * elementsPerPage;
