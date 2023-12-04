@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useSelector } from "react-redux";
 import { bookSchema } from './ValidationSchemas';
-import { sendForm as APISendForm, updateBook as APIUpdateBook, getBookById } from '../../API/book'
+import { sendForm as APISendForm, updateBook as APIUpdateBook, getBookById as APIGetBook} from '../../API/book'
 import countriesList from '../Countries';
 import { setBook, updateBook } from '../../store/slice/bookSlice';
 import { useDispatch } from 'react-redux';
@@ -24,6 +24,9 @@ function BookForm(){
     const[summary, setSummary] = useState('');
     const[illustrator, setIllustrator] = useState('');
     const[image, setImage] = useState('');
+    const[imgPath, setImgPath] = useState('');
+    const [imageURL, setImageURL] = useState('');
+    const[rating,setRating] = useState('');
     const navigate = useNavigate();
     const token = useSelector(state => state.auth.token);
     const dispatch = useDispatch();
@@ -32,7 +35,7 @@ function BookForm(){
     useEffect(() => {
         if(params.type === 'modify'){
             
-                getBookById(params.id, token)
+                APIGetBook(params.id, token)
                 .then((response) => {
                     console.log("response: ", response);
                     setTitle(response.title);
@@ -45,7 +48,8 @@ function BookForm(){
                     setIsbn(response.isbn);
                     setSummary(response.description);
                     setIllustrator(response.illustrator);
-                    setImage(response.img_path);
+                    setImgPath(response.img_path);
+                    setRating(response.rating);
                 })
                 .catch((error) => {
                     console.log("error: ", error);
@@ -88,7 +92,6 @@ async function sendForm (event) {
       illustrator,
       image,
     });
-    console.log("send form 2");
     formData.append('isbn', isbn);
     formData.append('title', title);
     formData.append('author', author);
@@ -100,49 +103,67 @@ async function sendForm (event) {
     formData.append('illustrator', illustrator);
     formData.append('publishing_house', editor);
     formData.append('image', image);
-    console.log("formData: ", formData);
-    console.log("send form 3");
-    console.log("params.type: ", params.type);
-    const bookData = [
-        {type: 'text', content:isbn},
-        {type: 'text', content: title},
-        {type: 'text', content: summary},
-        {type: 'text', content: country},
-        {type: 'text', content: genre},
-        {type: 'text', content: year},
-        {type: 'text', content: pages},
-        {type: 'text', content: editor},
-        {type: 'text', content: image},
-        {type: 'modifyButton', content: 'Modify'},
-        {type: 'deleteButton', content: 'Delete'}
-    ]
 
         if(params.type === 'add'){
 
-            console.log("send form 4");
             try {
-                console.log("send form 5");
                 await APISendForm(formData, token);
                 alert('The book has been added to the database');
+                try{
+                const newBook = await APIGetBook(isbn, token);
+                const bookData = [
+                    {type: 'text', content: isbn},
+                    {type: 'text', content: title},
+                    {type: 'text', content: newBook.rating},
+                    {type: 'text', content: author},
+                    {type: 'text', content: illustrator === '' ? illustrator : "none"},
+                    {type: 'text', content: summary},
+                    {type: 'text', content: country},
+                    {type: 'text', content: genre},
+                    {type: 'text', content: year},
+                    {type: 'text', content: pages},
+                    {type: 'text', content: editor},
+                    {type: 'text', content: newBook.img_path ? newBook.img_path : "none"},
+                    {type: 'modifyButton', content: 'Modify'},
+                    {type: 'deleteButton', content: 'Delete'}
+                ];
                 dispatch(setBook(bookData));
-            } catch (error) {
-                // Si une erreur se produit, vous pouvez traiter l'erreur ici
-                console.error("Error adding book:", error);
-    
-                // Affichez une alerte ou effectuez toute autre action en cas d'erreur
-                alert('Failed to add the book. Please check your input and try again.');
+            } catch (error){
+                console.error("Error fetching book:", error);
             }
+        } catch (error) {
+            // Si une erreur se produit, vous pouvez traiter l'erreur ici
+            console.error("Error adding book:", error);
+
+            // Affichez une alerte ou effectuez toute autre action en cas d'erreur
+            alert('Failed to add the book. The server had an unexpected error : ' ,error);
+        }
         }
         else if(params.type === 'modify'){
             // formData.append('avatar', avatar.current);
             try {
-                console.log("token update", token);
+                
                 await APIUpdateBook(formData,token);
                 //write the alert here
                 alert('The book has been modified in the database');
-                dispatch(updateBook(bookData));
+                const updateData = await APIGetBook(isbn, token);
+                dispatch(updateBook({
+                    isbn : isbn,
+                    title : title,
+                    rating : updateData.rating,
+                    author : author,
+                    illustrator : illustrator,
+                    description : summary,
+                    country : country,
+                    genre : genre,
+                    releasedYear : year,
+                    pages : pages,
+                    publishingHouse : editor,
+                    imgPath : updateData.img_path
+                }));
             } catch (e) {
                 console.log(e);
+                alert('Failed to update the book. The server had an unexpected error : ', error);
             }
         }
     }
@@ -271,11 +292,11 @@ async function sendForm (event) {
                         value={illustrator} onChange={e => setIllustrator(e.target.value)} />
                     </label>
                     <label>Image:</label>
-                        <br/>
+                        <br />
                         <input
-                            type={"file"}
-                            accept={"image/*"}
-                            onChange={(e) =>setImage(e.target.files[0])}
+                        type={"file"}
+                        accept={"image/*"}
+                        onChange={(e) => setImage(e.target.files[0])}
                         />
                      <input type="submit" value="Submit" />
             </form>
