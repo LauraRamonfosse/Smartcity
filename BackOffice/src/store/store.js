@@ -6,6 +6,7 @@ import reviewSlice from './slice/reviewSlice';
 import commentSlice from './slice/commentSlice';
 import roleSlice from './slice/roleSlice';
 import actorSlice from './slice/actorSlice';
+import bestBooksSlice from './slice/bestBooksSlice';
 import { combineReducers } from 'redux';
 import storage from 'redux-persist/lib/storage';
 import { persistStore, persistReducer } from 'redux-persist';
@@ -19,6 +20,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authReducer,
   books: bookSlice,
+  best : bestBooksSlice,
   users: userSlice,
   reviews: reviewSlice,
   comments: commentSlice,
