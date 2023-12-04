@@ -20,11 +20,12 @@ function DataTable() {
   const elementsPerPage = 7;
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  let headers = [];
+  const [headers, setHeaders] = useState([]);
   console.log("params.name: ", params.name);
   const [dataRows, setDataRows] = useState([]);
   const users = useSelector(state => state.users.users);
   const books = useSelector(state => state.books.books);
+  const topRatedBooks =useSelector(state => state.best.bestBooks);
   const reviews = useSelector(state => state.reviews.reviews);
   const roles = useSelector(state => state.roles.roles);
   const actors = useSelector(state => state.actors.actors);
@@ -32,27 +33,37 @@ function DataTable() {
 useEffect(() => {
   switch (params.name) {
     case 'users':
-      headers = ['ID', 'Username', 'Email', 'Role', 'Phone', 'Country', 'Newsletter', 'Delete', 'Modify'];
+      setHeaders(['ID', 'USERNAME', 'EMAIL', 'PASSWORD', 'COUNTRY', 'PHONE NUMBER', 'NEWSLETTER', 'MODIFY', 'DELETE']);
       setDataRows(users);
       break;
+
     case 'books':
-      headers = ['ID', 'Title', 'Author', 'Year', 'Genre', 'Country', 'Pages', 'Editor', 'ISBN', 'Summary', 'Illustrator', 'Delete', 'Modify'];
+      setHeaders(['ISBN', 'TITLE','RATING', 'AUTHOR','ILLUSTRATOR', 'DESCRIPTION', 'COUNTRY', 'GENRE', 'YEAR', 'PAGES', 'EDITOR','IMG', 'MODIFY', 'DELETE']);
       setDataRows(books);
       break;
+
     case 'comments':
-      headers = ['ID', 'Comment', 'Book', 'User', 'Delete', 'Modify'];
+      setHeaders(['ID', 'AUTHOR', 'CONTENT', 'RATING', 'MODIFY', 'DELETE']);
       break;
+
     case 'reviews':
-      headers = ['ID', 'Review', 'Book', 'User', 'Delete', 'Modify'];
+      setHeaders(['ID', 'AUTHOR', 'BOOK', 'CONTENT', 'TITLE', 'COMMENTS', 'RATING', 'EVAL', 'MODIFY', 'DELETE']);
       setDataRows(reviews);
       break;
+
     case 'roles':
-      headers = ['ID', 'Role', 'Delete', 'Modify'];
+      setHeaders(['ID', 'ROLE', 'ACTOR', 'BOOK']);
       setDataRows(roles);
       break;
+
     case 'actors':
-      headers = ['ID', 'Actor', 'Delete', 'Modify'];
+      setHeaders(['ID', 'ACTOR','BOOKS']);
       setDataRows(actors);
+      break;
+
+    case 'best' : 
+    setHeaders(['ISBN','TITLE', 'RATING']);
+      setDataRows(topRatedBooks);
       break;
     default:
       console.log("default");
@@ -90,7 +101,9 @@ console.log("dataRows: ", dataRows);
   return (
     <>
       <div className='tableContainer'>
+      {dataRows.length > 0 && (
         <SearchBar searchTerm={searchTerm} onSearch={handleSearch} />
+      )}
         <table className="dataTable">
           <thead>
             <tr>
