@@ -5,7 +5,12 @@ import { store } from './src/store/store';
 
 const App = () => {
   return (
-       <Navigation/>);
+    <>
+      <Provider store={store}>
+        <Navigation/>
+      </Provider>
+    </>
+       );
 };
 
 export default App;

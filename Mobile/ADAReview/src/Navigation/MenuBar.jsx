@@ -14,9 +14,9 @@ const Stack = createStackNavigator();
 
 const HomeStack = ()=>{
   return(
-    <Stack.Navigator screenOptions={{headerShown : false}}>
-      <Stack.Screen name= "Home" component={HomeScreen} />
-      <Stack.Screen name= "Book" component={BookScreen}/>
+    <Stack.Navigator initialRouteName='HomeStack/Home' screenOptions={{headerShown : false}}>
+      <Stack.Screen name= "HomeStack/Home" component={HomeScreen} />
+      <Stack.Screen name= "HomeStack/Book" component={BookScreen}/>
     </Stack.Navigator>
   );
 };
@@ -49,14 +49,10 @@ const MenuBar = () => {
         // tabBarActiveBackgroundColor : '#1E3335',
         tabBarStyle: {
           backgroundColor: '#354F52',
-          height:110,
-        },
-        tabBarItemStyle :{
-          paddingTop : 25,
-          paddingBottom : 5,
+          height:80,
         },
         tabBarLabelStyle: {
-          paddingTop : 5
+          paddingBottom: 15,
         }
         
       })}

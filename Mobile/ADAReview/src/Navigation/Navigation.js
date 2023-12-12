@@ -7,13 +7,10 @@ import MenuBar from './MenuBar';
 import LoginScreen from '../screens/LoginScreen';
 import BookScreen from '../screens/BookScreen.jsx';
 import HomeScreen from '../screens/HomeScreen';
-import { Provider } from 'react-redux';
-import { store } from '../store/store';
 
 const Stack = createStackNavigator();
 const Navigation = () => {
     return (
-      <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
@@ -21,7 +18,6 @@ const Navigation = () => {
         </Stack.Navigator>
         <StatusBar barStyle="dark-content"/>
       </NavigationContainer>
-      </Provider>
     );
   };
 

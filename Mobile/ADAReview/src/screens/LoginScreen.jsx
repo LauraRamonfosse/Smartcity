@@ -1,33 +1,30 @@
 // Login.js
 import React from 'react';
-import { View, Button, Alert } from 'react-native';
+import { View, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
-import { fetchBookData } from '../store/dataBaseLoader';
 import { login } from '../API/user';
+import { fetchBookData } from '../store/dataBaseLoader';
 
 function LoginScreen() {
     // const dispatch = useDispatch();
     const navigation = useNavigation();
     const dispatch = useDispatch();
+    const token = "";
   
     const APILogin = async () => {
       try {
         const username = 'truc';
         const password = 'coucou123';
         console.log("Tout est ok jusque le token");
-        const token = await login(username, password);
-
+        //const token = await login(username, password);
         if (token !== undefined) {
-          await fetchBookData(dispatch, token);
-          navigation.navigate('Home');
+        fetchBookData(dispatch);
+        navigation.navigate('MenuBar');
           
-        } else {
-          Alert.alert('Wrong username or password');
         }
       } catch (error) {
         console.error('Error during login:', error);
-        Alert.alert('Server error');
       }
     };
   

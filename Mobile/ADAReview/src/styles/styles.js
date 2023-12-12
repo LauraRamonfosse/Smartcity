@@ -31,6 +31,7 @@ export const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
+    alignItems:'flex-start'
   },
   title: {
     fontSize: 25,
